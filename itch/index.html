@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BACKBYTE — Multiplayer Social Deception Coding Game</title>
+  <meta name="description" content="Collaborate on code in real-time, solve programming tasks, and hunt down the Impostor before your codebase gets destroyed!">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-primary: #f0ece2;
+      --bg-secondary: #e4dfd3;
+      --bg-card: #faf8f4;
+      --bg-hover: #e8e4da;
+      --accent-blue: #2563eb;
+      --accent-purple: #7c3aed;
+      --accent-green: #16a34a;
+      --accent-red: #dc2626;
+      --accent-yellow: #ca8a04;
+      --text-primary: #1c1917;
+      --text-secondary: #44403c;
+      --text-muted: #78716c;
+      --border: #1c1917;
+      --pixel-shadow: 4px 4px 0px #1c1917;
+      --pixel-shadow-sm: 2px 2px 0px #1c1917;
+      --pixel-shadow-blue: 4px 4px 0px #1d4ed8;
+      --pixel-shadow-green: 4px 4px 0px #15803d;
+      --pixel-shadow-red: 4px 4px 0px #b91c1c;
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-mono: 'Space Mono', 'Courier New', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Pixel button base */
+    .pixel-btn {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      padding: 10px 16px;
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
+      outline: none;
+    }
+    .pixel-btn:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--border);
+    }
+    .pixel-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--border);
+    }
+    .pixel-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: var(--pixel-shadow) !important;
+    }
+
+    .pixel-btn-blue {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border-color: #1c1917;
+    }
+    .pixel-btn-green {
+      background: var(--accent-green);
+      color: #ffffff;
+      border-color: #1c1917;
+    }
+    .pixel-btn-red {
+      background: var(--accent-red);
+      color: #ffffff;
+      border-color: #1c1917;
+    }
+    .pixel-btn-yellow {
+      background: var(--accent-yellow);
+      color: #ffffff;
+      border-color: #1c1917;
+    }
+
+    /* Pixel panel */
+    .pixel-panel {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      padding: 16px;
+    }
+
+    .pixel-font {
+      font-family: var(--font-pixel);
+      line-height: 1.6;
+    }
+
+    /* CRT scanline effect */
+    .crt-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.12) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+      background-size: 100% 3px, 6px 100%;
+      z-index: 9999;
+      opacity: 0.8;
+      display: block;
+    }
+    .crt-overlay.disabled {
+      display: none;
+    }
+
+    /* Top navbar */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border-bottom: 3px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-pixel);
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: #1c1917;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-size: 14px;
+      border: 2px solid var(--accent-blue);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-tab {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      padding: 8px 12px;
+      background: transparent;
+      border: 2px solid transparent;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.1s;
+    }
+    .nav-tab:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    .nav-tab.active {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      box-shadow: 2px 2px 0 var(--border);
+      color: var(--accent-blue);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    /* Main Container */
+    #app-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: calc(100vh - 65px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* View sections */
+    .view-section {
+      display: none;
+      flex: 1;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .view-section.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================
+       VIEW 1: MENU VIEW
+       ========================================= */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      margin: auto;
+      max-width: 860px;
+    }
+
+    .hero-title {
+      font-family: var(--font-pixel);
+      font-size: 38px;
+      color: var(--text-primary);
+      text-shadow: 3px 3px 0px rgba(37, 99, 235, 0.4);
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .hero-tagline {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin-bottom: 32px;
+    }
+    .role-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .role-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      padding: 24px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .role-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 6px 6px 0px var(--border);
+    }
+    .role-card.dev-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 6px 6px 0px var(--accent-blue);
+    }
+    .role-card.imposter-card:hover {
+      border-color: var(--accent-red);
+      box-shadow: 6px 6px 0px var(--accent-red);
+    }
+    .role-card h3 {
+      font-family: var(--font-pixel);
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .role-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* =========================================
+       VIEW 2: SOLO / PRACTICE GAME VIEW
+       ========================================= */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      flex: 1;
+      height: 100%;
+    }
+    @media (max-width: 980px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Top game status bar */
+    .game-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow-sm);
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .progress-box {
+      flex: 1;
+      min-width: 200px;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      margin-bottom: 4px;
+    }
+    .progress-bar-track {
+      height: 14px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-green);
+      width: 25%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .editor-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Task tabs */
+    .task-selector-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .task-pill {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      padding: 6px 12px;
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .task-pill.active {
+      background: var(--accent-blue);
+      color: #fff;
+      box-shadow: 2px 2px 0 #1c1917;
+    }
+    .task-pill.completed {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+    .task-pill.completed.active {
+      background: var(--accent-green);
+      color: #fff;
+    }
+
+    /* Task header info */
+    .task-info-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      padding: 14px 16px;
+      box-shadow: var(--pixel-shadow-sm);
+    }
+    .task-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .task-title {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--accent-blue);
+    }
+    .task-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Code editor area */
+    .code-editor-box {
+      background: #18181b;
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .editor-topbar {
+      background: #27272a;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #3f3f46;
+    }
+    .editor-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .editor-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .editor-filename {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: #a1a1aa;
+    }
+
+    /* Editor body */
+    .editor-body {
+      display: flex;
+      min-height: 240px;
+      position: relative;
+      background: #18181b;
+    }
+    .line-numbers {
+      padding: 12px 8px;
+      color: #71717a;
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 20px;
+      border-right: 1px solid #3f3f46;
+      background: #202024;
+      min-width: 36px;
+      user-select: none;
+    }
+    .code-textarea {
+      flex: 1;
+      padding: 12px 14px;
+      background: transparent;
+      color: #f4f4f5;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 20px;
+      border: none;
+      outline: none;
+      resize: vertical;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+      tab-size: 2;
+    }
+
+    /* Sabotage overlay effects */
+    .sabotage-blur-effect {
+      filter: blur(4px) contrast(150%) hue-rotate(90deg);
+      transition: filter 0.3s;
+    }
+    .sabotage-glitch-banner {
+      display: none;
+      background: var(--accent-red);
+      color: #ffffff;
+      padding: 8px 12px;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-align: center;
+      animation: pulse 1s infinite alternate;
+    }
+    .sabotage-glitch-banner.visible {
+      display: block;
+    }
+    @keyframes pulse {
+      from { opacity: 0.85; }
+      to { opacity: 1; }
+    }
+
+    /* Editor controls and test output */
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .test-results-panel {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow-sm);
+      padding: 12px 16px;
+    }
+    .test-header {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .test-case-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      padding: 6px 8px;
+      border-bottom: 1px dashed #d6d0c4;
+    }
+    .test-case-item:last-child {
+      border-bottom: none;
+    }
+    .test-status-icon {
+      font-size: 14px;
+    }
+
+    /* Right sidebar */
+    .game-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .crew-panel {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow-sm);
+      padding: 14px;
+    }
+    .panel-heading {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .crew-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .crew-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border: 2px solid var(--border);
+      background: #faf8f4;
+      font-size: 12px;
+    }
+    .crew-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .crew-avatar {
+      font-size: 16px;
+    }
+    .crew-name {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+    }
+    .crew-badge {
+      font-size: 8px;
+      font-family: var(--font-pixel);
+      padding: 2px 4px;
+    }
+
+    /* Activity log */
+    .activity-log-panel {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow-sm);
+      padding: 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-height: 280px;
+    }
+    .activity-feed {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+      flex: 1;
+      padding-right: 4px;
+    }
+    .log-entry {
+      line-height: 1.4;
+      border-left: 2px solid var(--accent-blue);
+      padding-left: 6px;
+    }
+    .log-entry.alert {
+      border-left-color: var(--accent-red);
+      background: rgba(220, 38, 38, 0.08);
+      padding: 4px 6px;
+    }
+    .log-time {
+      color: var(--text-muted);
+      font-size: 9px;
+    }
+
+    /* Impostor Sabotage Toolbar */
+    .imposter-toolbar {
+      background: #fff0f0;
+      border: 3px solid var(--accent-red);
+      box-shadow: var(--pixel-shadow-red);
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .imposter-toolbar.visible {
+      display: flex;
+    }
+    .sabotage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* =========================================
+       VIEW 3: EMERGENCY MEETING VIEW
+       ========================================= */
+    .meeting-container {
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .meeting-header {
+      background: rgba(220, 38, 38, 0.1);
+      border: 3px solid var(--accent-red);
+      box-shadow: var(--pixel-shadow-red);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .meeting-chat-box {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      height: 260px;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-msg {
+      display: flex;
+      gap: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .chat-author {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      min-width: 90px;
+      padding-top: 2px;
+    }
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+    }
+    .chat-quick-responses {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .quick-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+    }
+    .quick-pill:hover {
+      background: var(--bg-hover);
+    }
+
+    .voting-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .vote-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow-sm);
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.1s;
+    }
+    .vote-card:hover:not(.voted) {
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 0 var(--border);
+      border-color: var(--accent-red);
+    }
+    .vote-card.voted {
+      background: #fecaca;
+      border-color: var(--accent-red);
+      cursor: default;
+    }
+
+    /* Ejection overlay modal */
+    .ejection-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .ejection-overlay.visible {
+      display: flex;
+    }
+    .ejection-card {
+      background: var(--bg-card);
+      border: 4px solid var(--border);
+      box-shadow: 8px 8px 0px #000;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* =========================================
+       VIEW 4: RESULTS VIEW
+       ========================================= */
+    .results-card {
+      max-width: 650px;
+      margin: 40px auto;
+      background: var(--bg-card);
+      border: 4px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      padding: 36px;
+      text-align: center;
+    }
+
+    /* =========================================
+       VIEW 5: ONLINE MULTIPLAYER VIEW
+       ========================================= */
+    .online-container {
+      max-width: 900px;
+      margin: 20px auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .online-config-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      padding: 24px;
+    }
+    .server-input-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .pixel-input {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 10px 14px;
+      border: 3px solid var(--border);
+      background: #ffffff;
+      color: var(--text-primary);
+      outline: none;
+      flex: 1;
+      min-width: 240px;
+    }
+    .pixel-input:focus {
+      border-color: var(--accent-blue);
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      padding: 4px 8px;
+      border: 2px solid var(--border);
+    }
+    .status-badge.online {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #15803d;
+    }
+    .status-badge.offline {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #b91c1c;
+    }
+    .status-badge.checking {
+      background: #fef9c3;
+      color: #854d0e;
+      border-color: #854d0e;
+    }
+
+    .embed-iframe-frame {
+      width: 100%;
+      height: 680px;
+      border: 3px solid var(--border);
+      box-shadow: var(--pixel-shadow);
+      background: #ffffff;
+      display: none;
+    }
+    .embed-iframe-frame.visible {
+      display: block;
+    }
+
+    /* =========================================
+       MODAL: HOW TO PLAY
+       ========================================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.visible {
+      display: flex;
+    }
+    .modal-window {
+      background: var(--bg-card);
+      border: 4px solid var(--border);
+      box-shadow: 8px 8px 0 #000;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      position: relative;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 680px) {
+      .hero-title { font-size: 24px; }
+      .role-cards-grid { grid-template-columns: 1fr; }
+      .header-bar { padding: 8px 12px; }
+      .logo-badge span { display: none; }
+      .nav-tab { padding: 6px 8px; font-size: 8px; }
+      .pixel-btn { font-size: 9px; padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Optional CRT scanline overlay -->
+  <div class="crt-overlay" id="crt-overlay"></div>
+
+  <!-- Main Top Bar -->
+  <header class="header-bar">
+    <div class="logo-badge">
+      <div class="logo-icon">&gt;_</div>
+      <span>BACKBYTE</span>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-target="view-menu" id="tab-menu">🎮 MENU</button>
+      <button class="nav-tab" data-target="view-game" id="tab-game">⚡ PRACTICE</button>
+      <button class="nav-tab" data-target="view-online" id="tab-online">🌐 MULTIPLAYER</button>
+    </nav>
+
+    <div class="header-controls">
+      <button class="pixel-btn icon-btn" id="btn-toggle-sound" title="Toggle Sound">🔊</button>
+      <button class="pixel-btn icon-btn" id="btn-toggle-crt" title="Toggle CRT Filter">📺</button>
+      <button class="pixel-btn icon-btn" id="btn-fullscreen" title="Toggle Fullscreen">⛶</button>
+      <button class="pixel-btn icon-btn" id="btn-help" title="How to Play">❓</button>
+    </div>
+  </header>
+
+  <!-- Application Body -->
+  <div id="app-container">
+
+    <!-- ========================================================= -->
+    <!-- VIEW 1: MAIN MENU                                         -->
+    <!-- ========================================================= -->
+    <section class="view-section active" id="view-menu">
+      <div class="hero-container">
+        <div class="section-label" style="border: 2px solid var(--accent-blue); padding: 4px 10px; font-family: var(--font-pixel); font-size: 8px; color: var(--accent-blue); margin-bottom: 16px;">
+          ITCH.IO WEB EDITION
+        </div>
+        <h1 class="hero-title">BACKBYTE</h1>
+        <p class="hero-tagline">
+          The real-time multiplayer social deduction coding game. Collaborate on code, complete programming challenges, and hunt down the Impostor before your codebase gets destroyed!
+        </p>
+
+        <div class="role-cards-grid">
+          <!-- Developer Card -->
+          <div class="role-card dev-card" id="card-play-dev">
+            <h3><span>🧑‍💻</span> PLAY AS DEVELOPER</h3>
+            <p>
+              Work alongside AI teammates to solve algorithms, spot suspicious code insertions, call emergency meetings, and vote out the saboteur.
+            </p>
+            <button class="pixel-btn pixel-btn-blue" style="width: 100%;">
+              START AS DEVELOPER →
+            </button>
+          </div>
+
+          <!-- Impostor Card -->
+          <div class="role-card imposter-card" id="card-play-imposter">
+            <h3><span>🕵️</span> PLAY AS IMPOSTOR</h3>
+            <p>
+              Pretend to collaborate while secretly injecting subtle bugs, blurring developer editors, deploying fake hints, and dodging accusations!
+            </p>
+            <button class="pixel-btn pixel-btn-red" style="width: 100%;">
+              START AS IMPOSTOR →
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;">
+          <button class="pixel-btn pixel-btn-green" id="btn-menu-online">
+            🌐 CONNECT TO LIVE SERVER
+          </button>
+          <button class="pixel-btn" id="btn-menu-how">
+            📖 HOW TO PLAY &amp; RULES
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 2: SOLO / PRACTICE CODING GAME                       -->
+    <!-- ========================================================= -->
+    <section class="view-section" id="view-game">
+      <!-- Game Top Bar -->
+      <div class="game-status-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div id="player-role-badge" class="pixel-btn pixel-btn-blue" style="padding: 4px 10px; font-size: 8px; cursor: default;">
+            ROLE: DEVELOPER
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-pixel);" id="room-code-tag">
+            ROOM: SIM-8821
+          </span>
+        </div>
+
+        <!-- Progress meter -->
+        <div class="progress-box">
+          <div class="progress-labels">
+            <span>TEAM CODEBASE HEALTH</span>
+            <span id="progress-percent">20%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 20%;"></div>
+          </div>
+        </div>
+
+        <!-- Timer & Emergency Call -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="pixel-font" style="font-size: 11px; color: var(--accent-red);" id="game-clock">
+            ⏱ 08:45
+          </span>
+          <button class="pixel-btn pixel-btn-red" id="btn-emergency-meeting">
+            🚨 EMERGENCY MEETING
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Game Grid -->
+      <div class="game-layout">
+        <!-- Left: Code Editor & Tasks -->
+        <div class="editor-container">
+          <!-- Task Selector -->
+          <div class="task-selector-bar" id="task-selector-bar">
+            <!-- Dynamically injected pills -->
+          </div>
+
+          <!-- Task Details -->
+          <div class="task-info-card">
+            <div class="task-info-header">
+              <span class="task-title" id="active-task-title">Task Title</span>
+              <span class="pixel-font" style="font-size: 8px; color: var(--accent-green);" id="active-task-diff">EASY</span>
+            </div>
+            <p class="task-desc" id="active-task-desc">Task description goes here.</p>
+          </div>
+
+          <!-- Code Editor -->
+          <div class="code-editor-box" id="code-editor-wrapper">
+            <div class="sabotage-glitch-banner" id="glitch-banner">
+              ⚠ SYSTEM CORRUPTION DETECTED: SCREEN BLUR ACTIVE
+            </div>
+            <div class="editor-topbar">
+              <div class="editor-dots">
+                <div class="editor-dot dot-red"></div>
+                <div class="editor-dot dot-yellow"></div>
+                <div class="editor-dot dot-green"></div>
+              </div>
+              <span class="editor-filename" id="editor-filename">solution.js</span>
+              <span style="font-size: 8px; font-family: var(--font-pixel); color: #10b981;" id="active-editor-indicator">
+                ● LIVE SYNC
+              </span>
+            </div>
+            <div class="editor-body">
+              <div class="line-numbers" id="line-numbers">1<br>2<br>3<br>4<br>5</div>
+              <textarea class="code-textarea" id="code-textarea" spellcheck="false" autocomplete="off"></textarea>
+            </div>
+          </div>
+
+          <!-- Controls & Actions -->
+          <div class="editor-actions">
+            <button class="pixel-btn pixel-btn-green" id="btn-run-tests">
+              ▶ RUN CODE &amp; TESTS
+            </button>
+            <button class="pixel-btn pixel-btn-blue" id="btn-submit-task">
+              ✓ SUBMIT SOLUTION
+            </button>
+            <button class="pixel-btn" id="btn-reset-code">
+              ↺ RESET
+            </button>
+            <span id="test-run-feedback" style="font-size: 11px; font-weight: bold; margin-left: auto;"></span>
+          </div>
+
+          <!-- Test Results Console -->
+          <div class="test-results-panel">
+            <div class="test-header">AUTOMATED TEST RESULTS:</div>
+            <div id="test-cases-container">
+              <!-- Dynamically populated tests -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Crew Roster, Sabotages, Live Git Activity -->
+        <div class="game-sidebar">
+          <!-- Impostor Sabotage Toolbar (Only shown if player is Impostor) -->
+          <div class="imposter-toolbar" id="imposter-toolbar">
+            <div class="panel-heading" style="color: var(--accent-red); margin-bottom: 6px;">
+              <span>☠ SABOTAGE ABILITIES</span>
+              <span id="imposter-mana">READY</span>
+            </div>
+            <div class="sabotage-grid">
+              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-bug" style="font-size: 8px; padding: 6px;">
+                🐛 INJECT BUG
+              </button>
+              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-blur" style="font-size: 8px; padding: 6px;">
+                🌫️ BLUR SCREEN
+              </button>
+              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-hint" style="font-size: 8px; padding: 6px;">
+                🤖 FAKE HINT
+              </button>
+              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-crash" style="font-size: 8px; padding: 6px;">
+                ⚡ SYNTAX CRASH
+              </button>
+            </div>
+          </div>
+
+          <!-- Crew Roster -->
+          <div class="crew-panel">
+            <div class="panel-heading">
+              <span>TEAM CREW (5)</span>
+              <span>1 IMPOSTOR</span>
+            </div>
+            <div class="crew-list" id="crew-list">
+              <!-- Dynamically injected crew items -->
+            </div>
+          </div>
+
+          <!-- Activity / Git Commits Feed -->
+          <div class="activity-log-panel">
+            <div class="panel-heading">
+              <span>LIVE REPO ACTIVITY</span>
+              <span style="color: var(--accent-green);">● ACTIVE</span>
+            </div>
+            <div class="activity-feed" id="activity-feed">
+              <!-- Injected log entries -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 3: EMERGENCY MEETING & VOTING                        -->
+    <!-- ========================================================= -->
+    <section class="view-section" id="view-meeting">
+      <div class="meeting-container">
+        <div class="meeting-header">
+          <div>
+            <h2 class="pixel-font" style="font-size: 13px; color: var(--accent-red); margin-bottom: 4px;">
+              🚨 EMERGENCY MEETING CALLED
+            </h2>
+            <p style="font-size: 12px; color: var(--text-secondary);" id="meeting-caller-text">
+              Emergency meeting called by YOU. Discuss suspicious edits and vote!
+            </p>
+          </div>
+          <div class="pixel-font" style="font-size: 14px; color: var(--accent-red);" id="meeting-timer">
+            ⏱ 45s
+          </div>
+        </div>
+
+        <!-- Chat Log -->
+        <div class="meeting-chat-box" id="meeting-chat-box">
+          <!-- Injected chat messages -->
+        </div>
+
+        <!-- User Quick Response Pills -->
+        <div class="chat-quick-responses" id="quick-replies-bar">
+          <span style="font-family: var(--font-pixel); font-size: 8px; align-self: center;">QUICK REPLIES:</span>
+          <button class="quick-pill" data-reply="I saw r00t_k1t touch line 8 right before the test failed!">"I saw r00t_k1t modify line 8!"</button>
+          <button class="quick-pill" data-reply="I was just solving the factorial function!">"I was fixing factorial!"</button>
+          <button class="quick-pill" data-reply="sarah_c seems legit, tests were passing when she worked.">"sarah_c seems legit."</button>
+          <button class="quick-pill" data-reply="Let's skip vote, we don't have enough proof yet.">"Let's skip vote."</button>
+        </div>
+
+        <!-- User text input -->
+        <div class="chat-input-bar">
+          <input type="text" class="pixel-input" id="chat-input" placeholder="Type an accusation, defense, or alibi..." autocomplete="off">
+          <button class="pixel-btn pixel-btn-blue" id="btn-send-chat">SEND</button>
+        </div>
+
+        <!-- Voting Cards Grid -->
+        <div style="margin-top: 10px;">
+          <div class="pixel-font" style="font-size: 10px; margin-bottom: 8px;" id="voting-status-header">
+            CAST YOUR VOTE TO EJECT:
+          </div>
+          <div class="voting-grid" id="voting-grid">
+            <!-- Injected vote options -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ejection Result Modal -->
+    <div class="ejection-overlay" id="ejection-overlay">
+      <div class="ejection-card">
+        <div style="font-size: 42px; margin-bottom: 12px;" id="ejection-avatar">🕵️</div>
+        <h2 class="pixel-font" style="font-size: 14px; margin-bottom: 12px;" id="ejection-name">
+          r00t_k1t was ejected.
+        </h2>
+        <div class="pixel-font" style="font-size: 11px; margin-bottom: 20px; color: var(--accent-red);" id="ejection-role-reveal">
+          They were the Impostor.
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px;" id="ejection-subtext">
+          0 Impostors remain.
+        </p>
+        <button class="pixel-btn pixel-btn-blue" id="btn-ejection-continue">
+          CONTINUE →
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 4: RESULTS / GAME OVER                               -->
+    <!-- ========================================================= -->
+    <section class="view-section" id="view-results">
+      <div class="results-card">
+        <div style="font-size: 48px; margin-bottom: 16px;" id="results-icon">🏆</div>
+        <h2 class="pixel-font" style="font-size: 18px; margin-bottom: 14px;" id="results-title">
+          DEVELOPERS VICTORY!
+        </h2>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;" id="results-summary">
+          The impostor was ejected and the codebase is completely restored.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; text-align: left;">
+          <div class="pixel-panel" style="padding: 12px;">
+            <div style="font-size: 10px; color: var(--text-muted);">CODE HEALTH</div>
+            <div class="pixel-font" style="font-size: 14px; color: var(--accent-green);" id="result-stat-health">100%</div>
+          </div>
+          <div class="pixel-panel" style="padding: 12px;">
+            <div style="font-size: 10px; color: var(--text-muted);">IMPOSTOR CAUGHT</div>
+            <div class="pixel-font" style="font-size: 14px; color: var(--accent-red);" id="result-stat-imposter">r00t_k1t</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="pixel-btn pixel-btn-green" id="btn-restart-game">
+            ↺ PLAY AGAIN
+          </button>
+          <button class="pixel-btn pixel-btn-blue" id="btn-switch-role">
+            🔀 SWITCH ROLE
+          </button>
+          <button class="pixel-btn" id="btn-return-menu">
+            🏠 MAIN MENU
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 5: ONLINE MULTIPLAYER                                -->
+    <!-- ========================================================= -->
+    <section class="view-section" id="view-online">
+      <div class="online-container">
+        <div class="online-config-card">
+          <div class="section-label" style="border: 2px solid var(--accent-green); color: var(--accent-green); font-family: var(--font-pixel); font-size: 8px; margin-bottom: 10px;">
+            ONLINE ROOM CONNECTOR
+          </div>
+          <h2 class="pixel-font" style="font-size: 14px; margin-bottom: 8px;">
+            CONNECT TO LIVE BACKBYTE SERVER
+          </h2>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+            Play with your real friends over WebSockets! You can connect to your deployed BACKBYTE server (Vercel, Render, Railway, or VPS) directly inside this itch.io player or in a new browser window.
+          </p>
+
+          <label style="font-size: 11px; font-weight: bold;">BACKBYTE DEPLOYMENT URL:</label>
+          <div class="server-input-group">
+            <input type="text" class="pixel-input" id="server-url-input" value="https://backbyte.xyz" placeholder="https://your-backbyte-app.vercel.app">
+            <button class="pixel-btn pixel-btn-blue" id="btn-ping-server">
+              TEST PING
+            </button>
+            <button class="pixel-btn pixel-btn-green" id="btn-launch-online">
+              ▶ LAUNCH IN ITCH IFRAME
+            </button>
+            <a href="https://backbyte.xyz" target="_blank" rel="noopener noreferrer" class="pixel-btn" id="btn-open-external">
+              ↗ OPEN IN NEW TAB
+            </a>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 14px;">
+            <span style="font-size: 11px;">SERVER STATUS:</span>
+            <span class="status-badge checking" id="server-status-badge">
+              ● CHECKING CONNECTIVITY...
+            </span>
+            <span id="server-ping-text" style="font-size: 11px; color: var(--text-muted);"></span>
+          </div>
+        </div>
+
+        <!-- Embedded Live Game Container -->
+        <iframe id="online-game-iframe" class="embed-iframe-frame" src="about:blank" allow="fullscreen; autoplay; clipboard-write; encrypted-media"></iframe>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: HOW TO PLAY & LORE                                 -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="modal-help">
+    <div class="modal-window">
+      <button class="pixel-btn modal-close-btn" id="btn-close-help">✕</button>
+      <div class="section-label" style="border: 2px solid var(--accent-blue); color: var(--accent-blue); font-family: var(--font-pixel); font-size: 8px; margin-bottom: 12px;">
+        RULES &amp; DOSSIER
+      </div>
+      <h2 class="pixel-font" style="font-size: 14px; margin-bottom: 16px;">
+        HOW TO PLAY BACKBYTE
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+        <p>
+          <strong style="color: var(--text-primary);">BACKBYTE</strong> is a social deduction coding game inspired by <em>Among Us</em>, tailored for software developers and problem solvers.
+        </p>
+
+        <div class="pixel-panel" style="border-color: var(--accent-blue);">
+          <h4 class="pixel-font" style="font-size: 10px; color: var(--accent-blue); margin-bottom: 6px;">
+            🧑‍💻 DEVELOPERS (CREW):
+          </h4>
+          <ul style="padding-left: 20px;">
+            <li>Collaborate on coding tasks in JavaScript and complete functions.</li>
+            <li>Run test suites to raise <strong>Team Codebase Health</strong> to 100%.</li>
+            <li>Monitor live git commits for unexpected bug injections or mutated logic.</li>
+            <li>Hit <strong>EMERGENCY MEETING</strong> to discuss, interrogate, and vote out the suspect!</li>
+          </ul>
+        </div>
+
+        <div class="pixel-panel" style="border-color: var(--accent-red);">
+          <h4 class="pixel-font" style="font-size: 10px; color: var(--accent-red); margin-bottom: 6px;">
+            🕵️ THE IMPOSTOR:
+          </h4>
+          <ul style="padding-left: 20px;">
+            <li>Blend in! Pretend to write code while covertly destroying tests.</li>
+            <li>Use Sabotage Abilities: <strong>Inject Bugs</strong>, <strong>Blur Editors</strong>, and <strong>Fake AI Hints</strong>.</li>
+            <li>Create confusion during emergency meetings, provide plausible alibis, and frame teammates.</li>
+          </ul>
+        </div>
+
+        <div class="pixel-panel">
+          <h4 class="pixel-font" style="font-size: 10px; margin-bottom: 6px;">
+            ⌨️ TIPS FOR ITCH.IO PLAYERS:
+          </h4>
+          <ul style="padding-left: 20px;">
+            <li>Press <kbd>Tab</kbd> in the code editor to indent code.</li>
+            <li>Click the Fullscreen (⛶) button on top right to expand the game frame.</li>
+            <li>Use the Quick Replies during meetings or type custom accusations in the chat bar.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT GAME LOGIC & SOUND ENGINE                      -->
+  <!-- ========================================================= -->
+  <script>
+    /* -----------------------------------------------------------
+       1. 8-BIT RETRO SOUND ENGINE (Web Audio API)
+       ----------------------------------------------------------- */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type, duration, delay = 0, gainLevel = 0.1) {
+        if (!this.enabled || !this.ctx) return;
+        setTimeout(() => {
+          try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(gainLevel, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
+          } catch (e) {}
+        }, delay * 1000);
+      }
+
+      playClick() {
+        this.init();
+        this.playTone(600, 'triangle', 0.04, 0, 0.05);
+      }
+
+      playType() {
+        this.init();
+        this.playTone(1200 + Math.random() * 400, 'sine', 0.02, 0, 0.02);
+      }
+
+      playSuccess() {
+        this.init();
+        this.playTone(523.25, 'triangle', 0.12, 0, 0.08); // C5
+        this.playTone(659.25, 'triangle', 0.12, 0.1, 0.08); // E5
+        this.playTone(783.99, 'triangle', 0.25, 0.2, 0.1);  // G5
+      }
+
+      playError() {
+        this.init();
+        this.playTone(220, 'sawtooth', 0.15, 0, 0.08);
+        this.playTone(180, 'sawtooth', 0.25, 0.12, 0.08);
+      }
+
+      playAlarm() {
+        this.init();
+        for (let i = 0; i < 3; i++) {
+          this.playTone(880, 'square', 0.15, i * 0.3, 0.06);
+          this.playTone(440, 'square', 0.15, i * 0.3 + 0.15, 0.06);
+        }
+      }
+
+      playSabotage() {
+        this.init();
+        this.playTone(120, 'sawtooth', 0.4, 0, 0.12);
+        this.playTone(90, 'sawtooth', 0.5, 0.1, 0.12);
+      }
+
+      playVote() {
+        this.init();
+        this.playTone(400, 'triangle', 0.08, 0, 0.08);
+        this.playTone(550, 'triangle', 0.1, 0.06, 0.08);
+      }
+
+      playVictory() {
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          this.playTone(freq, 'triangle', 0.2, idx * 0.14, 0.1);
+        });
+      }
+
+      playDefeat() {
+        this.init();
+        const notes = [440, 415.3, 392, 349.2];
+        notes.forEach((freq, idx) => {
+          this.playTone(freq, 'sawtooth', 0.3, idx * 0.18, 0.08);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* -----------------------------------------------------------
+       2. TASK DATABASE & CODE EXECUTOR
+       ----------------------------------------------------------- */
+    const TASKS = [
+      {
+        id: 'task-1',
+        title: 'Fix: Off-by-one in sumArray',
+        difficulty: 'EASY',
+        filename: 'sumArray.js',
+        desc: 'The sumArray function skips the last item due to a bad loop condition. Fix it so it returns the total of all numbers in the array.',
+        starterCode: `function sumArray(arr) {\n  let total = 0;\n  // BUG: condition misses the last element!\n  for (let i = 0; i < arr.length - 1; i++) {\n    total += arr[i];\n  }\n  return total;\n}`,
+        tests: [
+          { input: '[1, 2, 3, 4, 5]', expected: 15, call: '(fn) => fn([1, 2, 3, 4, 5])' },
+          { input: '[10]', expected: 10, call: '(fn) => fn([10])' },
+          { input: '[0, 0, 0]', expected: 0, call: '(fn) => fn([0, 0, 0])' },
+          { input: '[-1, 2, -3, 4]', expected: 2, call: '(fn) => fn([-1, 2, -3, 4])' }
+        ]
+      },
+      {
+        id: 'task-2',
+        title: 'Complete: isPalindrome',
+        difficulty: 'EASY',
+        filename: 'isPalindrome.js',
+        desc: 'Implement isPalindrome(str) to return true if the string reads the same forwards and backwards (case-insensitive, alphanumeric only).',
+        starterCode: `function isPalindrome(str) {\n  // Clean string and check if it is equal reversed\n  const clean = str.toLowerCase().replace(/[^a-z0-9]/g, '');\n  return clean === clean.split('').reverse().join('');\n}`,
+        tests: [
+          { input: '"racecar"', expected: true, call: '(fn) => fn("racecar")' },
+          { input: '"hello"', expected: false, call: '(fn) => fn("hello")' },
+          { input: '"A man a plan a canal Panama"', expected: true, call: '(fn) => fn("A man a plan a canal Panama")' }
+        ]
+      },
+      {
+        id: 'task-3',
+        title: 'Fix: Broken Factorial Base Case',
+        difficulty: 'MEDIUM',
+        filename: 'factorial.js',
+        desc: 'Factorial currently returns 0 when n === 0, making any computation evaluate to 0. Correct the base case so 0! === 1.',
+        starterCode: `function factorial(n) {\n  // BUG: factorial of 0 should be 1!\n  if (n === 0) return 0;\n  return n * factorial(n - 1);\n}`,
+        tests: [
+          { input: '0', expected: 1, call: '(fn) => fn(0)' },
+          { input: '1', expected: 1, call: '(fn) => fn(1)' },
+          { input: '5', expected: 120, call: '(fn) => fn(5)' },
+          { input: '6', expected: 720, call: '(fn) => fn(6)' }
+        ]
+      },
+      {
+        id: 'task-4',
+        title: 'Complete: Two Sum Index Finder',
+        difficulty: 'MEDIUM',
+        filename: 'twoSum.js',
+        desc: 'Find indices of the two numbers in nums that add up to target. Return an array of two indices [i, j].',
+        starterCode: `function twoSum(nums, target) {\n  const map = {};\n  for (let i = 0; i < nums.length; i++) {\n    const diff = target - nums[i];\n    if (diff in map) return [map[diff], i];\n    map[nums[i]] = i;\n  }\n  return [];\n}`,
+        tests: [
+          { input: '[2, 7, 11, 15], 9', expected: '[0,1]', call: '(fn) => JSON.stringify(fn([2, 7, 11, 15], 9))' },
+          { input: '[3, 2, 4], 6', expected: '[1,2]', call: '(fn) => JSON.stringify(fn([3, 2, 4], 6))' }
+        ]
+      }
+    ];
+
+    /* -----------------------------------------------------------
+       3. CREW MATES ROSTER & AI LOGIC
+       ----------------------------------------------------------- */
+    const CREW = [
+      { id: 'you', name: 'YOU', avatar: '👤', color: '#2563eb', isPlayer: true, alive: true },
+      { id: 'alex', name: 'alex_dev', avatar: '🧑‍💻', color: '#16a34a', isPlayer: false, alive: true },
+      { id: 'sarah', name: 'sarah_c', avatar: '👩‍💻', color: '#7c3aed', isPlayer: false, alive: true },
+      { id: 'mike', name: 'mike_99', avatar: '🧑‍🔬', color: '#ca8a04', isPlayer: false, alive: true },
+      { id: 'root', name: 'r00t_k1t', avatar: '🕵️', color: '#dc2626', isPlayer: false, alive: true }
+    ];
+
+    /* -----------------------------------------------------------
+       4. GAME STATE
+       ----------------------------------------------------------- */
+    const gameState = {
+      playerRole: 'developer', // 'developer' or 'imposter'
+      secretImposterId: 'root',
+      activeTaskId: 'task-1',
+      taskCodes: {},
+      completedTasks: new Set(),
+      codebaseHealth: 25,
+      gameTimeLeft: 540, // seconds
+      timerInterval: null,
+      meetingTimerInterval: null,
+      botSimulationInterval: null,
+      blurTimeout: null,
+      recentEdits: [],
+      meetingActive: false,
+      votes: {},
+      voted: false
+    };
+
+    // Prepopulate task code buffers
+    TASKS.forEach(t => {
+      gameState.taskCodes[t.id] = t.starterCode;
+    });
+
+    /* -----------------------------------------------------------
+       5. DOM ELEMENTS
+       ----------------------------------------------------------- */
+    const views = {
+      menu: document.getElementById('view-menu'),
+      game: document.getElementById('view-game'),
+      meeting: document.getElementById('view-meeting'),
+      results: document.getElementById('view-results'),
+      online: document.getElementById('view-online')
+    };
+
+    const tabs = {
+      menu: document.getElementById('tab-menu'),
+      game: document.getElementById('tab-game'),
+      online: document.getElementById('tab-online')
+    };
+
+    function showView(viewId) {
+      Object.keys(views).forEach(key => {
+        views[key].classList.remove('active');
+      });
+      if (views[viewId]) {
+        views[viewId].classList.add('active');
+      }
+
+      // Update active header tab
+      Object.values(tabs).forEach(t => t.classList.remove('active'));
+      if (viewId === 'menu') tabs.menu.classList.add('active');
+      if (viewId === 'game' || viewId === 'meeting' || viewId === 'results') tabs.game.classList.add('active');
+      if (viewId === 'online') tabs.online.classList.add('active');
+    }
+
+    /* -----------------------------------------------------------
+       6. NAVIGATION & BUTTONS
+       ----------------------------------------------------------- */
+    tabs.menu.addEventListener('click', () => { sound.playClick(); showView('menu'); });
+    tabs.game.addEventListener('click', () => { sound.playClick(); showView('game'); });
+    tabs.online.addEventListener('click', () => { sound.playClick(); showView('online'); });
+
+    document.getElementById('card-play-dev').addEventListener('click', () => {
+      sound.playClick();
+      startGame('developer');
+    });
+
+    document.getElementById('card-play-imposter').addEventListener('click', () => {
+      sound.playClick();
+      startGame('imposter');
+    });
+
+    document.getElementById('btn-menu-online').addEventListener('click', () => {
+      sound.playClick();
+      showView('online');
+    });
+
+    document.getElementById('btn-menu-how').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('modal-help').classList.add('visible');
+    });
+
+    document.getElementById('btn-help').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('modal-help').classList.add('visible');
+    });
+
+    document.getElementById('btn-close-help').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('modal-help').classList.remove('visible');
+    });
+
+    // Sound toggle
+    const btnToggleSound = document.getElementById('btn-toggle-sound');
+    btnToggleSound.addEventListener('click', () => {
+      sound.enabled = !sound.enabled;
+      btnToggleSound.innerText = sound.enabled ? '🔊' : '🔇';
+      sound.playClick();
+    });
+
+    // CRT filter toggle
+    const btnToggleCrt = document.getElementById('btn-toggle-crt');
+    const crtOverlay = document.getElementById('crt-overlay');
+    btnToggleCrt.addEventListener('click', () => {
+      crtOverlay.classList.toggle('disabled');
+      sound.playClick();
+    });
+
+    // Fullscreen toggle
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      sound.playClick();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    /* -----------------------------------------------------------
+       7. GAME LOGIC & TASK CONTROLS
+       ----------------------------------------------------------- */
+    const codeTextarea = document.getElementById('code-textarea');
+    const lineNumbers = document.getElementById('line-numbers');
+    const progressFill = document.getElementById('progress-bar-fill');
+    const progressText = document.getElementById('progress-percent');
+    const testCasesContainer = document.getElementById('test-cases-container');
+    const testFeedback = document.getElementById('test-run-feedback');
+    const activityFeed = document.getElementById('activity-feed');
+
+    function updateLineNumbers() {
+      const lines = codeTextarea.value.split('\n').length;
+      lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
+    }
+
+    codeTextarea.addEventListener('input', () => {
+      gameState.taskCodes[gameState.activeTaskId] = codeTextarea.value;
+      updateLineNumbers();
+      sound.playType();
+    });
+
+    // Support Tab key indentation
+    codeTextarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = codeTextarea.selectionStart;
+        const end = codeTextarea.selectionEnd;
+        codeTextarea.value = codeTextarea.value.substring(0, start) + '  ' + codeTextarea.value.substring(end);
+        codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 2;
+        updateLineNumbers();
+      }
+    });
+
+    function setCodebaseHealth(newVal) {
+      gameState.codebaseHealth = Math.max(0, Math.min(100, newVal));
+      progressFill.style.width = gameState.codebaseHealth + '%';
+      progressText.innerText = gameState.codebaseHealth + '%';
+
+      if (gameState.codebaseHealth >= 100) {
+        endGame(gameState.playerRole === 'developer');
+      }
+    }
+
+    function renderTaskSelector() {
+      const bar = document.getElementById('task-selector-bar');
+      bar.innerHTML = '';
+      TASKS.forEach(t => {
+        const pill = document.createElement('div');
+        pill.className = `task-pill ${t.id === gameState.activeTaskId ? 'active' : ''} ${gameState.completedTasks.has(t.id) ? 'completed' : ''}`;
+        pill.innerText = `${gameState.completedTasks.has(t.id) ? '✓ ' : ''}${t.filename}`;
+        pill.addEventListener('click', () => {
+          sound.playClick();
+          switchTask(t.id);
+        });
+        bar.appendChild(pill);
+      });
+    }
+
+    function switchTask(taskId) {
+      gameState.activeTaskId = taskId;
+      const task = TASKS.find(t => t.id === taskId);
+      document.getElementById('active-task-title').innerText = task.title;
+      document.getElementById('active-task-desc').innerText = task.desc;
+      document.getElementById('active-task-diff').innerText = task.difficulty;
+      document.getElementById('editor-filename').innerText = task.filename;
+      codeTextarea.value = gameState.taskCodes[taskId] || task.starterCode;
+      updateLineNumbers();
+      renderTaskSelector();
+      runTests(false);
+    }
+
+    function logActivity(text, isAlert = false) {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${isAlert ? 'alert' : ''}`;
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      entry.innerHTML = `<span class="log-time">[${timeStr}]</span> ${text}`;
+      activityFeed.prepend(entry);
+
+      // keep only last 25 logs
+      while (activityFeed.children.length > 25) {
+        activityFeed.removeChild(activityFeed.lastChild);
+      }
+    }
+
+    function renderCrewList() {
+      const container = document.getElementById('crew-list');
+      container.innerHTML = '';
+      CREW.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'crew-item';
+        item.style.borderColor = c.color;
+        item.innerHTML = `
+          <div class="crew-left">
+            <span class="crew-avatar">${c.avatar}</span>
+            <span class="crew-name" style="color: ${c.color}">${c.name} ${c.isPlayer ? '(YOU)' : ''}</span>
+          </div>
+          <span class="crew-badge" style="background: ${c.alive ? '#dcfce7' : '#fee2e2'}; color: ${c.alive ? '#15803d' : '#b91c1c'}; border: 1px solid currentColor;">
+            ${c.alive ? 'ONLINE' : 'EJECTED'}
+          </span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    /* -----------------------------------------------------------
+       8. RUNNING CODE & TEST CASES
+       ----------------------------------------------------------- */
+    function runTests(playSound = true) {
+      const task = TASKS.find(t => t.id === gameState.activeTaskId);
+      const code = codeTextarea.value;
+      testCasesContainer.innerHTML = '';
+
+      let fn;
+      let compileError = null;
+
+      try {
+        // Safe evaluation of the function definition
+        const factory = new Function(`${code}\n return ${task.filename.replace('.js', '')};`);
+        fn = factory();
+      } catch (err) {
+        compileError = err.message;
+      }
+
+      let allPassed = true;
+
+      task.tests.forEach((test, idx) => {
+        const row = document.createElement('div');
+        row.className = 'test-case-item';
+
+        if (compileError) {
+          row.innerHTML = `
+            <span class="test-status-icon" style="color: var(--accent-red)">✕</span>
+            <span>Case ${idx + 1} (${test.input}): Syntax Error: ${compileError}</span>
+          `;
+          allPassed = false;
+        } else {
+          try {
+            const runner = new Function('fn', `return (${test.call})(fn);`);
+            const actual = runner(fn);
+            const passed = actual === test.expected;
+
+            if (!passed) allPassed = false;
+
+            row.innerHTML = `
+              <span class="test-status-icon" style="color: ${passed ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                ${passed ? '✓' : '✕'}
+              </span>
+              <span>Case ${idx + 1} [${test.input}] → Expected: <code>${test.expected}</code>, Got: <code>${actual}</code></span>
+            `;
+          } catch (e) {
+            allPassed = false;
+            row.innerHTML = `
+              <span class="test-status-icon" style="color: var(--accent-red)">✕</span>
+              <span>Case ${idx + 1} [${test.input}] → Runtime Error: ${e.message}</span>
+            `;
+          }
+        }
+        testCasesContainer.appendChild(row);
+      });
+
+      if (playSound) {
+        if (allPassed) {
+          sound.playSuccess();
+          testFeedback.style.color = 'var(--accent-green)';
+          testFeedback.innerText = 'ALL TESTS PASSED!';
+        } else {
+          sound.playError();
+          testFeedback.style.color = 'var(--accent-red)';
+          testFeedback.innerText = 'SOME TESTS FAILED';
+        }
+      }
+
+      return allPassed;
+    }
+
+    document.getElementById('btn-run-tests').addEventListener('click', () => {
+      runTests(true);
+    });
+
+    document.getElementById('btn-submit-task').addEventListener('click', () => {
+      const passed = runTests(false);
+      if (passed) {
+        sound.playSuccess();
+        gameState.completedTasks.add(gameState.activeTaskId);
+        renderTaskSelector();
+        setCodebaseHealth(gameState.codebaseHealth + 20);
+        logActivity(`🎉 <strong>YOU</strong> passed all test cases for <code>${gameState.activeTaskId}</code>! Codebase health increased.`);
+        testFeedback.style.color = 'var(--accent-green)';
+        testFeedback.innerText = 'TASK SUBMITTED! +20% HEALTH';
+      } else {
+        sound.playError();
+        testFeedback.style.color = 'var(--accent-red)';
+        testFeedback.innerText = 'CANNOT SUBMIT: TESTS FAILING';
+      }
+    });
+
+    document.getElementById('btn-reset-code').addEventListener('click', () => {
+      sound.playClick();
+      const task = TASKS.find(t => t.id === gameState.activeTaskId);
+      codeTextarea.value = task.starterCode;
+      gameState.taskCodes[gameState.activeTaskId] = task.starterCode;
+      updateLineNumbers();
+      runTests(false);
+    });
+
+    /* -----------------------------------------------------------
+       9. SIMULATION ENGINE (AI Crewmates & Impostor Sabotage)
+       ----------------------------------------------------------- */
+    function startSimulation() {
+      clearInterval(gameState.botSimulationInterval);
+      clearInterval(gameState.timerInterval);
+
+      // Main countdown timer
+      gameState.timerInterval = setInterval(() => {
+        gameState.gameTimeLeft--;
+        const mins = String(Math.floor(gameState.gameTimeLeft / 60)).padStart(2, '0');
+        const secs = String(gameState.gameTimeLeft % 60).padStart(2, '0');
+        document.getElementById('game-clock').innerText = `⏱ ${mins}:${secs}`;
+
+        if (gameState.gameTimeLeft <= 0) {
+          clearInterval(gameState.timerInterval);
+          endGame(gameState.playerRole === 'imposter');
+        }
+      }, 1000);
+
+      // AI Bot autonomous actions
+      gameState.botSimulationInterval = setInterval(() => {
+        if (gameState.meetingActive) return;
+
+        const bots = CREW.filter(c => !c.isPlayer && c.alive);
+        if (bots.length === 0) return;
+        const randomBot = bots[Math.floor(Math.random() * bots.length)];
+
+        // If random bot is the Impostor
+        if (randomBot.id === gameState.secretImposterId) {
+          const sabotageRoll = Math.random();
+          if (sabotageRoll < 0.4) {
+            // Secret Impostor injects a subtle bug
+            setCodebaseHealth(gameState.codebaseHealth - 12);
+            logActivity(`⚠ <strong style="color:var(--accent-red)">${randomBot.name}</strong> pushed commit <code>git commit -m "refactor syntax"</code>. Test failure detected!`, true);
+            gameState.recentEdits.push({ bot: randomBot.name, action: 'corrupted loop condition' });
+          } else {
+            logActivity(`ℹ ${randomBot.name} is inspecting unit tests.`);
+          }
+        } else {
+          // Innocent AI bot working
+          const workRoll = Math.random();
+          if (workRoll < 0.35) {
+            setCodebaseHealth(gameState.codebaseHealth + 8);
+            logActivity(`✓ <strong style="color:${randomBot.color}">${randomBot.name}</strong> completed a unit test. +8% health.`);
+            gameState.recentEdits.push({ bot: randomBot.name, action: 'solved unit test' });
+          } else {
+            logActivity(`✎ ${randomBot.name} editing <code>isPalindrome.js</code>...`);
+          }
+        }
+      }, 7000);
+    }
+
+    /* -----------------------------------------------------------
+       10. IMPOSTOR ACTIONS (When user is playing as Impostor)
+       ----------------------------------------------------------- */
+    function setupImposterAbilities() {
+      const tb = document.getElementById('imposter-toolbar');
+      if (gameState.playerRole === 'imposter') {
+        tb.classList.add('visible');
+      } else {
+        tb.classList.remove('visible');
+      }
+    }
+
+    function triggerCooldown(btn, seconds, label) {
+      btn.disabled = true;
+      let left = seconds;
+      btn.innerText = `⏳ (${left}s)`;
+      const cd = setInterval(() => {
+        left--;
+        if (left <= 0) {
+          clearInterval(cd);
+          btn.disabled = false;
+          btn.innerText = label;
+        } else {
+          btn.innerText = `⏳ (${left}s)`;
+        }
+      }, 1000);
+    }
+
+    document.getElementById('btn-sabotage-bug').addEventListener('click', (e) => {
+      sound.playSabotage();
+      setCodebaseHealth(gameState.codebaseHealth - 15);
+      logActivity(`🐛 <strong>YOU</strong> injected a stealth syntax bug into the test runner! (-15% Health)`, true);
+      triggerCooldown(e.target, 25, '🐛 INJECT BUG');
+    });
+
+    document.getElementById('btn-sabotage-blur').addEventListener('click', (e) => {
+      sound.playSabotage();
+      const editorBox = document.getElementById('code-editor-wrapper');
+      const banner = document.getElementById('glitch-banner');
+      editorBox.classList.add('sabotage-blur-effect');
+      banner.classList.add('visible');
+      logActivity(`🌫️ <strong>YOU</strong> triggered screen blur sabotage across the team!`, true);
+
+      clearTimeout(gameState.blurTimeout);
+      gameState.blurTimeout = setTimeout(() => {
+        editorBox.classList.remove('sabotage-blur-effect');
+        banner.classList.remove('visible');
+      }, 10000);
+
+      triggerCooldown(e.target, 35, '🌫️ BLUR SCREEN');
+    });
+
+    document.getElementById('btn-sabotage-hint').addEventListener('click', (e) => {
+      sound.playSabotage();
+      logActivity(`🤖 <strong>AI ASSISTANT (FAKE):</strong> Recommend changing loop condition to <code>i < arr.length - 2</code>.`, true);
+      triggerCooldown(e.target, 20, '🤖 FAKE HINT');
+    });
+
+    document.getElementById('btn-sabotage-crash').addEventListener('click', (e) => {
+      sound.playSabotage();
+      setCodebaseHealth(gameState.codebaseHealth - 20);
+      logActivity(`⚡ <strong>YOU</strong> triggered a syntax crash! Automated pipeline halted. (-20% Health)`, true);
+      triggerCooldown(e.target, 40, '⚡ SYNTAX CRASH');
+    });
+
+    /* -----------------------------------------------------------
+       11. EMERGENCY MEETING & VOTING
+       ----------------------------------------------------------- */
+    const meetingChatBox = document.getElementById('meeting-chat-box');
+    const votingGrid = document.getElementById('voting-grid');
+
+    document.getElementById('btn-emergency-meeting').addEventListener('click', () => {
+      callEmergencyMeeting('YOU');
+    });
+
+    function callEmergencyMeeting(callerName) {
+      sound.playAlarm();
+      gameState.meetingActive = true;
+      gameState.voted = false;
+      gameState.votes = {};
+      showView('meeting');
+
+      document.getElementById('meeting-caller-text').innerText =
+        `Emergency meeting called by ${callerName}. Debate suspicious commits and cast your vote!`;
+
+      meetingChatBox.innerHTML = '';
+      appendChatMessage('SYSTEM', '🚨 EMERGENCY MEETING STARTED. 45 SECONDS ON CLOCK.', '#dc2626');
+
+      // Populate AI discussion messages with personality and recent context
+      const suspects = CREW.filter(c => !c.isPlayer && c.alive);
+      const messages = [
+        { sender: 'alex_dev', color: '#16a34a', text: 'Who modified the sumArray loop condition?? It was passing 2 minutes ago!' },
+        { sender: 'sarah_c', color: '#7c3aed', text: 'I saw someone commit right before health plummeted.' },
+        { sender: 'mike_99', color: '#ca8a04', text: gameState.playerRole === 'imposter' ? 'YOU have been editing without committing solutions!' : 'r00t_k1t has been acting super suspicious in the commits.' },
+        { sender: 'r00t_k1t', color: '#dc2626', text: 'I was literally working on isPalindrome, don\'t blame me!' }
+      ];
+
+      messages.forEach((msg, idx) => {
+        setTimeout(() => {
+          if (!gameState.meetingActive) return;
+          appendChatMessage(msg.sender, msg.text, msg.color);
+          sound.playTone(500 + idx * 80, 'sine', 0.05, 0, 0.03);
+        }, (idx + 1) * 1400);
+      });
+
+      // Meeting countdown
+      let meetingSecs = 35;
+      document.getElementById('meeting-timer').innerText = `⏱ ${meetingSecs}s`;
+      clearInterval(gameState.meetingTimerInterval);
+      gameState.meetingTimerInterval = setInterval(() => {
+        meetingSecs--;
+        document.getElementById('meeting-timer').innerText = `⏱ ${meetingSecs}s`;
+        if (meetingSecs <= 0) {
+          clearInterval(gameState.meetingTimerInterval);
+          resolveVotes();
+        }
+      }, 1000);
+
+      renderVotingCards();
+    }
+
+    function appendChatMessage(sender, text, color) {
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg';
+      msg.innerHTML = `
+        <span class="chat-author" style="color: ${color}">${sender}:</span>
+        <span>${text}</span>
+      `;
+      meetingChatBox.appendChild(msg);
+      meetingChatBox.scrollTop = meetingChatBox.scrollHeight;
+    }
+
+    // Quick reply buttons
+    document.querySelectorAll('.quick-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sound.playClick();
+        const reply = btn.getAttribute('data-reply');
+        appendChatMessage('YOU', reply, '#2563eb');
+      });
+    });
+
+    document.getElementById('btn-send-chat').addEventListener('click', () => {
+      const input = document.getElementById('chat-input');
+      const val = input.value.trim();
+      if (!val) return;
+      sound.playClick();
+      appendChatMessage('YOU', val, '#2563eb');
+      input.value = '';
+    });
+
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('btn-send-chat').click();
+      }
+    });
+
+    function renderVotingCards() {
+      votingGrid.innerHTML = '';
+      CREW.filter(c => c.alive).forEach(c => {
+        const card = document.createElement('div');
+        card.className = `vote-card ${gameState.voted ? 'voted' : ''}`;
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">${c.avatar}</span>
+            <span style="font-family: var(--font-pixel); font-size: 8px; color: ${c.color}">${c.name}</span>
+          </div>
+          <span style="font-family: var(--font-pixel); font-size: 8px;" id="vote-count-${c.id}">0 votes</span>
+        `;
+        card.addEventListener('click', () => {
+          if (gameState.voted) return;
+          castVote(c.id);
+        });
+        votingGrid.appendChild(card);
+      });
+
+      // Skip Vote button
+      const skipCard = document.createElement('div');
+      skipCard.className = `vote-card ${gameState.voted ? 'voted' : ''}`;
+      skipCard.innerHTML = `
+        <span style="font-family: var(--font-pixel); font-size: 8px; color: var(--text-muted)">[SKIP VOTE]</span>
+        <span style="font-family: var(--font-pixel); font-size: 8px;" id="vote-count-skip">0 votes</span>
+      `;
+      skipCard.addEventListener('click', () => {
+        if (gameState.voted) return;
+        castVote('skip');
+      });
+      votingGrid.appendChild(skipCard);
+    }
+
+    function castVote(targetId) {
+      sound.playVote();
+      gameState.voted = true;
+      gameState.votes['you'] = targetId;
+
+      // Simulate AI bot votes
+      const livingBots = CREW.filter(c => !c.isPlayer && c.alive);
+      livingBots.forEach(bot => {
+        if (gameState.playerRole === 'imposter') {
+          // If player is Impostor, bots suspect player or skip
+          gameState.votes[bot.id] = Math.random() < 0.6 ? 'you' : 'skip';
+        } else {
+          // If player is Developer, bots suspect r00t_k1t or random
+          gameState.votes[bot.id] = Math.random() < 0.7 ? gameState.secretImposterId : 'skip';
+        }
+      });
+
+      // Count votes
+      const tally = {};
+      Object.values(gameState.votes).forEach(t => {
+        tally[t] = (tally[t] || 0) + 1;
+      });
+
+      // Update card displays
+      Object.keys(tally).forEach(id => {
+        const el = document.getElementById(`vote-count-${id}`);
+        if (el) el.innerText = `${tally[id]} votes`;
+      });
+
+      document.querySelectorAll('.vote-card').forEach(vc => vc.classList.add('voted'));
+
+      setTimeout(() => {
+        resolveVotes();
+      }, 2000);
+    }
+
+    function resolveVotes() {
+      clearInterval(gameState.meetingTimerInterval);
+      gameState.meetingActive = false;
+
+      const tally = {};
+      Object.values(gameState.votes).forEach(t => {
+        tally[t] = (tally[t] || 0) + 1;
+      });
+
+      let highestTarget = null;
+      let highestCount = 0;
+      let tie = false;
+
+      Object.keys(tally).forEach(target => {
+        if (target === 'skip') return;
+        if (tally[target] > highestCount) {
+          highestCount = tally[target];
+          highestTarget = target;
+          tie = false;
+        } else if (tally[target] === highestCount) {
+          tie = true;
+        }
+      });
+
+      const overlay = document.getElementById('ejection-overlay');
+      const avatarEl = document.getElementById('ejection-avatar');
+      const nameEl = document.getElementById('ejection-name');
+      const roleEl = document.getElementById('ejection-role-reveal');
+      const subEl = document.getElementById('ejection-subtext');
+
+      if (!highestTarget || tie || highestCount <= 1) {
+        sound.playVote();
+        avatarEl.innerText = '🤷';
+        nameEl.innerText = 'No one was ejected.';
+        roleEl.innerText = tie ? '(Tie in votes)' : '(Skipped / Not enough votes)';
+        subEl.innerText = 'The crew continues debugging.';
+      } else {
+        const ejected = CREW.find(c => c.id === highestTarget);
+        if (ejected) {
+          ejected.alive = false;
+          renderCrewList();
+          avatarEl.innerText = ejected.avatar;
+          nameEl.innerText = `${ejected.name} was ejected.`;
+
+          const wasImposter = (ejected.id === gameState.secretImposterId) || (ejected.isPlayer && gameState.playerRole === 'imposter');
+
+          if (wasImposter) {
+            sound.playVictory();
+            roleEl.innerText = 'They WERE the Impostor!';
+            roleEl.style.color = 'var(--accent-green)';
+            subEl.innerText = '0 Impostors remain.';
+          } else {
+            sound.playError();
+            roleEl.innerText = 'They were NOT the Impostor.';
+            roleEl.style.color = 'var(--accent-red)';
+            subEl.innerText = '1 Impostor still roams the codebase.';
+          }
+        }
+      }
+
+      overlay.classList.add('visible');
+    }
+
+    document.getElementById('btn-ejection-continue').addEventListener('click', () => {
+      sound.playClick();
+      document.getElementById('ejection-overlay').classList.remove('visible');
+
+      // Check win/loss conditions
+      const imposter = CREW.find(c => c.id === gameState.secretImposterId);
+      const you = CREW.find(c => c.isPlayer);
+
+      if (!you.alive) {
+        // Player was ejected!
+        endGame(false);
+      } else if (!imposter.alive) {
+        // Secret imposter was ejected!
+        endGame(gameState.playerRole === 'developer');
+      } else {
+        // Return to game
+        showView('game');
+      }
+    });
+
+    /* -----------------------------------------------------------
+       12. GAME START & END
+       ----------------------------------------------------------- */
+    function startGame(role) {
+      gameState.playerRole = role;
+      gameState.codebaseHealth = 20;
+      gameState.gameTimeLeft = 540;
+      gameState.completedTasks.clear();
+      gameState.meetingActive = false;
+
+      // Reset crew
+      CREW.forEach(c => { c.alive = true; });
+
+      if (role === 'imposter') {
+        gameState.secretImposterId = 'you';
+        document.getElementById('player-role-badge').className = 'pixel-btn pixel-btn-red';
+        document.getElementById('player-role-badge').innerText = 'ROLE: IMPOSTOR';
+      } else {
+        gameState.secretImposterId = 'root';
+        document.getElementById('player-role-badge').className = 'pixel-btn pixel-btn-blue';
+        document.getElementById('player-role-badge').innerText = 'ROLE: DEVELOPER';
+      }
+
+      setupImposterAbilities();
+      renderCrewList();
+      setCodebaseHealth(20);
+      switchTask('task-1');
+      startSimulation();
+      showView('game');
+
+      logActivity(`🚀 Match started in room <code>SIM-8821</code> as <strong>${role.toUpperCase()}</strong>.`);
+    }
+
+    function endGame(victory) {
+      clearInterval(gameState.timerInterval);
+      clearInterval(gameState.botSimulationInterval);
+
+      if (victory) {
+        sound.playVictory();
+        document.getElementById('results-icon').innerText = '🏆';
+        document.getElementById('results-title').innerText = 'VICTORY!';
+        document.getElementById('results-title').style.color = 'var(--accent-green)';
+        document.getElementById('results-summary').innerText =
+          gameState.playerRole === 'developer'
+            ? 'The codebase has been successfully defended and the Impostor was neutralized!'
+            : 'You successfully sabotaged the codebase without getting detected!';
+      } else {
+        sound.playDefeat();
+        document.getElementById('results-icon').innerText = '☠';
+        document.getElementById('results-title').innerText = 'DEFEAT!';
+        document.getElementById('results-title').style.color = 'var(--accent-red)';
+        document.getElementById('results-summary').innerText =
+          gameState.playerRole === 'developer'
+            ? 'The Impostor succeeded in sabotaging the production server!'
+            : 'You were caught and ejected from the team!';
+      }
+
+      document.getElementById('result-stat-health').innerText = gameState.codebaseHealth + '%';
+      document.getElementById('result-stat-imposter').innerText =
+        gameState.playerRole === 'imposter' ? 'YOU' : 'r00t_k1t';
+
+      showView('results');
+    }
+
+    document.getElementById('btn-restart-game').addEventListener('click', () => {
+      sound.playClick();
+      startGame(gameState.playerRole);
+    });
+
+    document.getElementById('btn-switch-role').addEventListener('click', () => {
+      sound.playClick();
+      startGame(gameState.playerRole === 'developer' ? 'imposter' : 'developer');
+    });
+
+    document.getElementById('btn-return-menu').addEventListener('click', () => {
+      sound.playClick();
+      showView('menu');
+    });
+
+    /* -----------------------------------------------------------
+       13. ONLINE MULTIPLAYER SERVER CONNECTOR
+       ----------------------------------------------------------- */
+    const serverUrlInput = document.getElementById('server-url-input');
+    const serverStatusBadge = document.getElementById('server-status-badge');
+    const serverPingText = document.getElementById('server-ping-text');
+    const onlineGameIframe = document.getElementById('online-game-iframe');
+    const btnOpenExternal = document.getElementById('btn-open-external');
+
+    function checkServerStatus() {
+      const url = serverUrlInput.value.trim().replace(/\/$/, '');
+      btnOpenExternal.href = url;
+      serverStatusBadge.className = 'status-badge checking';
+      serverStatusBadge.innerText = '● CHECKING...';
+      serverPingText.innerText = '';
+
+      const start = performance.now();
+      fetch(`${url}`, { method: 'HEAD', mode: 'no-cors' })
+        .then(() => {
+          const latency = Math.round(performance.now() - start);
+          serverStatusBadge.className = 'status-badge online';
+          serverStatusBadge.innerText = '● SERVER RESPONDING';
+          serverPingText.innerText = `(${latency}ms latency)`;
+        })
+        .catch(() => {
+          // If no-cors or network error, let's still provide clear status
+          serverStatusBadge.className = 'status-badge offline';
+          serverStatusBadge.innerText = '● OFFLINE / WAITING DEPLOYMENT';
+          serverPingText.innerText = '(Ready to connect when host is live)';
+        });
+    }
+
+    document.getElementById('btn-ping-server').addEventListener('click', () => {
+      sound.playClick();
+      checkServerStatus();
+    });
+
+    document.getElementById('btn-launch-online').addEventListener('click', () => {
+      sound.playClick();
+      const url = serverUrlInput.value.trim();
+      onlineGameIframe.src = url;
+      onlineGameIframe.classList.add('visible');
+    });
+
+    serverUrlInput.addEventListener('change', () => {
+      btnOpenExternal.href = serverUrlInput.value.trim();
+    });
+
+    // Check server status on first page load
+    setTimeout(checkServerStatus, 500);
+
+    // Initial setup
+    updateLineNumbers();
+  </script>
+</body>
+</html>
