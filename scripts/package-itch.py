@@ -10,6 +10,7 @@ def package_itch():
     # Files to include in the zip root
     files_to_pack = [
         ("index.html", os.path.join(itch_dir, "index.html")),
+        ("bgm.mp3", os.path.join(itch_dir, "bgm.mp3")),
         ("favicon.svg", os.path.join(itch_dir, "favicon.svg")),
         ("logo.svg", os.path.join(itch_dir, "logo.svg")),
     ]

@@ -371,24 +371,120 @@
     .task-pill {
       font-family: var(--font-pixel);
       font-size: 8px;
-      padding: 6px 12px;
-      border: 2px solid var(--border);
-      background: var(--bg-card);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1px solid rgba(28, 25, 23, 0.18);
+      background: rgba(28, 25, 23, 0.05);
+      color: var(--text-secondary);
       cursor: pointer;
       white-space: nowrap;
+      box-shadow: none !important;
+      transition: all 0.15s ease;
+    }
+    .task-pill:hover {
+      background: rgba(28, 25, 23, 0.1);
     }
     .task-pill.active {
-      background: var(--accent-blue);
-      color: #fff;
-      box-shadow: 2px 2px 0 #1c1917;
+      background: rgba(37, 99, 235, 0.12);
+      color: #1d4ed8;
+      border-color: rgba(37, 99, 235, 0.3);
+      box-shadow: none !important;
     }
     .task-pill.completed {
-      border-color: var(--accent-green);
-      color: var(--accent-green);
+      background: rgba(22, 163, 74, 0.08);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.25);
     }
     .task-pill.completed.active {
-      background: var(--accent-green);
-      color: #fff;
+      background: rgba(22, 163, 74, 0.18);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.35);
+      box-shadow: none !important;
+    }
+
+    /* Task difficulty capsule badge - flat UI, translucent solid, zero glow */
+    .diff-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      transition: all 0.15s ease;
+    }
+    .diff-badge.easy {
+      background: rgba(37, 99, 235, 0.1);
+      color: #1d4ed8;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .diff-badge.medium {
+      background: rgba(202, 138, 4, 0.1);
+      color: #854d0e;
+      border: 1px solid rgba(202, 138, 4, 0.2);
+    }
+    .diff-badge.hard {
+      background: rgba(220, 38, 38, 0.1);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    /* Top bar role badge capsule */
+    .role-capsule-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      font-size: 8px;
+      font-family: var(--font-pixel);
+      border-radius: 9999px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: default;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      transition: all 0.15s ease;
+    }
+    .role-capsule-badge.role-developer {
+      background: rgba(22, 163, 74, 0.12);
+      color: #15803d;
+      border: 1px solid rgba(22, 163, 74, 0.25);
+    }
+    .role-capsule-badge.role-impostor {
+      background: rgba(220, 38, 38, 0.12);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.25);
+    }
+
+    /* Top bar emergency meeting flat capsule button */
+    .emergency-capsule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 9px;
+      font-family: var(--font-pixel);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      color: #b91c1c;
+      border-radius: 9999px;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .emergency-capsule-btn:hover:not(:disabled) {
+      background: rgba(220, 38, 38, 0.2);
+      transform: none;
+    }
+    .emergency-capsule-btn:active:not(:disabled) {
+      background: rgba(220, 38, 38, 0.25);
+      transform: none;
     }
 
     /* Task header info */
@@ -576,10 +672,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 10px;
-      border: 2px solid var(--border);
-      background: #faf8f4;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(28, 25, 23, 0.12);
+      background: rgba(28, 25, 23, 0.03);
       font-size: 12px;
+      transition: all 0.15s ease;
+    }
+    .crew-item.is-player {
+      background: rgba(28, 25, 23, 0.08);
+      border-color: rgba(28, 25, 23, 0.2);
     }
     .crew-left {
       display: flex;
@@ -596,7 +698,11 @@
     .crew-badge {
       font-size: 8px;
       font-family: var(--font-pixel);
-      padding: 2px 4px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      box-shadow: none !important;
+      text-shadow: none !important;
     }
 
     /* Activity log */
@@ -636,9 +742,10 @@
 
     /* Impostor Sabotage Toolbar */
     .imposter-toolbar {
-      background: #fff0f0;
-      border: 3px solid var(--accent-red);
-      box-shadow: var(--pixel-shadow-red);
+      background: rgba(220, 38, 38, 0.05);
+      border: 2px solid rgba(220, 38, 38, 0.25);
+      border-radius: 8px;
+      box-shadow: none;
       padding: 12px;
       display: none;
       flex-direction: column;
@@ -651,6 +758,30 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+    }
+    .sabotage-btn {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      font-weight: 700;
+      padding: 8px 6px;
+      border-radius: 8px;
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      color: #b91c1c;
+      cursor: pointer;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      transition: all 0.15s ease;
+    }
+    .sabotage-btn:hover:not(:disabled) {
+      background: rgba(220, 38, 38, 0.18);
+    }
+    .sabotage-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: rgba(28, 25, 23, 0.15);
+      background: var(--bg-hover);
+      color: var(--text-muted);
     }
 
     /* =========================================
@@ -707,13 +838,17 @@
     }
     .quick-pill {
       font-size: 11px;
-      padding: 4px 10px;
-      border: 2px solid var(--border);
-      background: var(--bg-card);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      border: 1px solid rgba(28, 25, 23, 0.18);
+      background: rgba(28, 25, 23, 0.05);
+      color: var(--text-primary);
       cursor: pointer;
+      box-shadow: none !important;
+      transition: all 0.15s ease;
     }
     .quick-pill:hover {
-      background: var(--bg-hover);
+      background: rgba(28, 25, 23, 0.12);
     }
 
     .voting-grid {
@@ -739,8 +874,8 @@
       border-color: var(--accent-red);
     }
     .vote-card.voted {
-      background: #fecaca;
-      border-color: var(--accent-red);
+      background: rgba(220, 38, 38, 0.12);
+      border-color: #b91c1c;
       cursor: default;
     }
 
@@ -829,23 +964,25 @@
       gap: 6px;
       font-family: var(--font-pixel);
       font-size: 8px;
-      padding: 4px 8px;
-      border: 2px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      box-shadow: none !important;
+      text-shadow: none !important;
     }
     .status-badge.online {
-      background: #dcfce7;
+      background: rgba(22, 163, 74, 0.12);
       color: #15803d;
-      border-color: #15803d;
+      border: 1px solid rgba(22, 163, 74, 0.25);
     }
     .status-badge.offline {
-      background: #fee2e2;
+      background: rgba(220, 38, 38, 0.12);
       color: #b91c1c;
-      border-color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.25);
     }
     .status-badge.checking {
-      background: #fef9c3;
+      background: rgba(202, 138, 4, 0.12);
       color: #854d0e;
-      border-color: #854d0e;
+      border: 1px solid rgba(202, 138, 4, 0.25);
     }
 
     .embed-iframe-frame {
@@ -988,8 +1125,8 @@
       <!-- Game Top Bar -->
       <div class="game-status-bar">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div id="player-role-badge" class="pixel-btn pixel-btn-blue" style="padding: 4px 10px; font-size: 8px; cursor: default;">
-            ROLE: DEVELOPER
+          <div id="player-role-badge" class="role-capsule-badge role-developer">
+            👨‍💻 ROLE: DEVELOPER
           </div>
           <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-pixel);" id="room-code-tag">
             ROOM: SIM-8821
@@ -1012,7 +1149,7 @@
           <span class="pixel-font" style="font-size: 11px; color: var(--accent-red);" id="game-clock">
             ⏱ 08:45
           </span>
-          <button class="pixel-btn pixel-btn-red" id="btn-emergency-meeting">
+          <button class="emergency-capsule-btn" id="btn-emergency-meeting">
             🚨 EMERGENCY MEETING
           </button>
         </div>
@@ -1031,7 +1168,7 @@
           <div class="task-info-card">
             <div class="task-info-header">
               <span class="task-title" id="active-task-title">Task Title</span>
-              <span class="pixel-font" style="font-size: 8px; color: var(--accent-green);" id="active-task-diff">EASY</span>
+              <span class="diff-badge easy" id="active-task-diff">EASY</span>
             </div>
             <p class="task-desc" id="active-task-desc">Task description goes here.</p>
           </div>
@@ -1090,16 +1227,16 @@
               <span id="imposter-mana">READY</span>
             </div>
             <div class="sabotage-grid">
-              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-bug" style="font-size: 8px; padding: 6px;">
+              <button class="sabotage-btn" id="btn-sabotage-bug">
                 🐛 INJECT BUG
               </button>
-              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-blur" style="font-size: 8px; padding: 6px;">
+              <button class="sabotage-btn" id="btn-sabotage-blur">
                 🌫️ BLUR SCREEN
               </button>
-              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-hint" style="font-size: 8px; padding: 6px;">
+              <button class="sabotage-btn" id="btn-sabotage-hint">
                 🤖 FAKE HINT
               </button>
-              <button class="pixel-btn pixel-btn-red" id="btn-sabotage-crash" style="font-size: 8px; padding: 6px;">
+              <button class="sabotage-btn" id="btn-sabotage-crash">
                 ⚡ SYNTAX CRASH
               </button>
             </div>
@@ -1256,14 +1393,14 @@
 
           <label style="font-size: 11px; font-weight: bold;">BACKBYTE DEPLOYMENT URL:</label>
           <div class="server-input-group">
-            <input type="text" class="pixel-input" id="server-url-input" value="https://backbyte.xyz" placeholder="https://your-backbyte-app.vercel.app">
+            <input type="text" class="pixel-input" id="server-url-input" value="https://pot-specified-analog-results.trycloudflare.com" placeholder="https://your-backbyte-app.vercel.app">
             <button class="pixel-btn pixel-btn-blue" id="btn-ping-server">
               TEST PING
             </button>
             <button class="pixel-btn pixel-btn-green" id="btn-launch-online">
               ▶ LAUNCH IN ITCH IFRAME
             </button>
-            <a href="https://backbyte.xyz" target="_blank" rel="noopener noreferrer" class="pixel-btn" id="btn-open-external">
+            <a href="https://pot-specified-analog-results.trycloudflare.com" target="_blank" rel="noopener noreferrer" class="pixel-btn" id="btn-open-external">
               ↗ OPEN IN NEW TAB
             </a>
           </div>
@@ -1350,6 +1487,33 @@
       constructor() {
         this.ctx = null;
         this.enabled = true;
+        this.bgm = null;
+        this.bgmPlaying = false;
+        this.pauseReasons = new Set();
+        this.pauseTimeout = null;
+
+        // Auto unlock audio on first interaction
+        const unlock = () => {
+          this.init();
+          if (this.bgmPlaying && this.enabled) {
+            this.bgm?.play().catch(() => {});
+          }
+          window.removeEventListener('click', unlock);
+          window.removeEventListener('keydown', unlock);
+          window.removeEventListener('touchstart', unlock);
+        };
+        window.addEventListener('click', unlock, { passive: true });
+        window.addEventListener('keydown', unlock, { passive: true });
+        window.addEventListener('touchstart', unlock, { passive: true });
+
+        // Auto pause on tab switch
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            this.pauseBgm('tab-hidden');
+          } else {
+            this.resumeBgm('tab-hidden');
+          }
+        });
       }
 
       init() {
@@ -1362,6 +1526,68 @@
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
         }
+        if (!this.bgm) {
+          try {
+            this.bgm = new Audio('bgm.mp3');
+            this.bgm.loop = true;
+            this.bgm.volume = 0.28;
+            this.bgm.preload = 'auto';
+          } catch (e) {}
+        }
+      }
+
+      playBgm() {
+        this.init();
+        this.bgmPlaying = true;
+        if (!this.enabled || this.pauseReasons.size > 0 || !this.bgm) return;
+        this.bgm.play().catch(() => {});
+      }
+
+      pauseBgm(reason = 'manual', autoResumeMs = 0) {
+        this.pauseReasons.add(reason);
+        if (this.bgm) {
+          this.bgm.pause();
+        }
+        if (this.pauseTimeout) {
+          clearTimeout(this.pauseTimeout);
+          this.pauseTimeout = null;
+        }
+        if (autoResumeMs > 0) {
+          this.pauseTimeout = setTimeout(() => {
+            this.resumeBgm(reason);
+          }, autoResumeMs);
+        }
+      }
+
+      resumeBgm(reason) {
+        if (reason) {
+          this.pauseReasons.delete(reason);
+        } else {
+          this.pauseReasons.clear();
+        }
+        if (this.pauseReasons.size === 0 && this.bgmPlaying && this.enabled && this.bgm) {
+          this.bgm.play().catch(() => {});
+        }
+      }
+
+      stopBgm() {
+        this.bgmPlaying = false;
+        this.pauseReasons.clear();
+        if (this.bgm) {
+          this.bgm.pause();
+          this.bgm.currentTime = 0;
+        }
+      }
+
+      toggleSound() {
+        this.init();
+        this.enabled = !this.enabled;
+        if (!this.enabled) {
+          this.bgm?.pause();
+        } else if (this.bgmPlaying && this.pauseReasons.size === 0) {
+          this.bgm?.play().catch(() => {});
+        }
+        return this.enabled;
       }
 
       playTone(freq, type, duration, delay = 0, gainLevel = 0.1) {
@@ -1612,9 +1838,8 @@
     // Sound toggle
     const btnToggleSound = document.getElementById('btn-toggle-sound');
     btnToggleSound.addEventListener('click', () => {
-      sound.enabled = !sound.enabled;
-      btnToggleSound.innerText = sound.enabled ? '🔊' : '🔇';
-      sound.playClick();
+      const isEnabled = sound.toggleSound();
+      btnToggleSound.innerText = isEnabled ? '🔊' : '🔇';
     });
 
     // CRT filter toggle
@@ -1699,7 +1924,10 @@
       const task = TASKS.find(t => t.id === taskId);
       document.getElementById('active-task-title').innerText = task.title;
       document.getElementById('active-task-desc').innerText = task.desc;
-      document.getElementById('active-task-diff').innerText = task.difficulty;
+      const diffBadge = document.getElementById('active-task-diff');
+      const diff = (task.difficulty || 'easy').toLowerCase();
+      diffBadge.innerText = task.difficulty;
+      diffBadge.className = `diff-badge ${diff}`;
       document.getElementById('editor-filename').innerText = task.filename;
       codeTextarea.value = gameState.taskCodes[taskId] || task.starterCode;
       updateLineNumbers();
@@ -1726,14 +1954,13 @@
       container.innerHTML = '';
       CREW.forEach(c => {
         const item = document.createElement('div');
-        item.className = 'crew-item';
-        item.style.borderColor = c.color;
+        item.className = `crew-item ${c.isPlayer ? 'is-player' : ''}`;
         item.innerHTML = `
           <div class="crew-left">
             <span class="crew-avatar">${c.avatar}</span>
             <span class="crew-name" style="color: ${c.color}">${c.name} ${c.isPlayer ? '(YOU)' : ''}</span>
           </div>
-          <span class="crew-badge" style="background: ${c.alive ? '#dcfce7' : '#fee2e2'}; color: ${c.alive ? '#15803d' : '#b91c1c'}; border: 1px solid currentColor;">
+          <span class="crew-badge" style="background: ${c.alive ? 'rgba(22, 163, 74, 0.12)' : 'rgba(220, 38, 38, 0.12)'}; color: ${c.alive ? '#15803d' : '#b91c1c'}; border: 1px solid ${c.alive ? 'rgba(22, 163, 74, 0.25)' : 'rgba(220, 38, 38, 0.25)'};">
             ${c.alive ? 'ONLINE' : 'EJECTED'}
           </span>
         `;
@@ -1925,6 +2152,7 @@
 
     document.getElementById('btn-sabotage-bug').addEventListener('click', (e) => {
       sound.playSabotage();
+      sound.pauseBgm('sabotage', 2000);
       setCodebaseHealth(gameState.codebaseHealth - 15);
       logActivity(`🐛 <strong>YOU</strong> injected a stealth syntax bug into the test runner! (-15% Health)`, true);
       triggerCooldown(e.target, 25, '🐛 INJECT BUG');
@@ -1932,6 +2160,7 @@
 
     document.getElementById('btn-sabotage-blur').addEventListener('click', (e) => {
       sound.playSabotage();
+      sound.pauseBgm('sabotage', 3000);
       const editorBox = document.getElementById('code-editor-wrapper');
       const banner = document.getElementById('glitch-banner');
       editorBox.classList.add('sabotage-blur-effect');
@@ -1949,12 +2178,14 @@
 
     document.getElementById('btn-sabotage-hint').addEventListener('click', (e) => {
       sound.playSabotage();
+      sound.pauseBgm('sabotage', 1500);
       logActivity(`🤖 <strong>AI ASSISTANT (FAKE):</strong> Recommend changing loop condition to <code>i < arr.length - 2</code>.`, true);
       triggerCooldown(e.target, 20, '🤖 FAKE HINT');
     });
 
     document.getElementById('btn-sabotage-crash').addEventListener('click', (e) => {
       sound.playSabotage();
+      sound.pauseBgm('sabotage', 2500);
       setCodebaseHealth(gameState.codebaseHealth - 20);
       logActivity(`⚡ <strong>YOU</strong> triggered a syntax crash! Automated pipeline halted. (-20% Health)`, true);
       triggerCooldown(e.target, 40, '⚡ SYNTAX CRASH');
@@ -1972,6 +2203,7 @@
 
     function callEmergencyMeeting(callerName) {
       sound.playAlarm();
+      sound.pauseBgm('meeting');
       gameState.meetingActive = true;
       gameState.voted = false;
       gameState.votes = {};
@@ -2200,6 +2432,7 @@
       } else {
         // Return to game
         showView('game');
+        sound.resumeBgm('meeting');
       }
     });
 
@@ -2207,6 +2440,7 @@
        12. GAME START & END
        ----------------------------------------------------------- */
     function startGame(role) {
+      sound.playBgm();
       gameState.playerRole = role;
       gameState.codebaseHealth = 20;
       gameState.gameTimeLeft = 540;
@@ -2218,12 +2452,14 @@
 
       if (role === 'imposter') {
         gameState.secretImposterId = 'you';
-        document.getElementById('player-role-badge').className = 'pixel-btn pixel-btn-red';
-        document.getElementById('player-role-badge').innerText = 'ROLE: IMPOSTOR';
+        const roleBadge = document.getElementById('player-role-badge');
+        roleBadge.className = 'role-capsule-badge role-impostor';
+        roleBadge.innerHTML = '😈 ROLE: IMPOSTOR';
       } else {
         gameState.secretImposterId = 'root';
-        document.getElementById('player-role-badge').className = 'pixel-btn pixel-btn-blue';
-        document.getElementById('player-role-badge').innerText = 'ROLE: DEVELOPER';
+        const roleBadge = document.getElementById('player-role-badge');
+        roleBadge.className = 'role-capsule-badge role-developer';
+        roleBadge.innerHTML = '👨‍💻 ROLE: DEVELOPER';
       }
 
       setupImposterAbilities();
@@ -2237,6 +2473,7 @@
     }
 
     function endGame(victory) {
+      sound.stopBgm();
       clearInterval(gameState.timerInterval);
       clearInterval(gameState.botSimulationInterval);
 
@@ -2279,6 +2516,7 @@
 
     document.getElementById('btn-return-menu').addEventListener('click', () => {
       sound.playClick();
+      sound.stopBgm();
       showView('menu');
     });
 

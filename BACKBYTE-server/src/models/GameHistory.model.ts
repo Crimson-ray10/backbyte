@@ -4,7 +4,7 @@ export interface IGameHistory extends Document {
   gameId: Types.ObjectId;
   roomCode: string;
   players: {
-    userId: Types.ObjectId;
+    userId: string;
     role: string;
     isWinner: boolean;
     tasksCompleted: number;
@@ -22,7 +22,7 @@ const GameHistorySchema = new Schema<IGameHistory>({
   roomCode: { type: String, required: true },
   players: [
     {
-      userId: { type: Schema.Types.ObjectId, ref: 'User' },
+      userId: { type: String },
       role: String,
       isWinner: Boolean,
       tasksCompleted: Number,

@@ -24,6 +24,7 @@ import { MeetingModal } from '@/components/meeting/MeetingModal';
 import { GameOverScreen } from '@/components/game/GameOverScreen';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DirectJoinModal } from '@/components/game/DirectJoinModal';
+import { useBgm } from '@/hooks/useBgm';
 
 type MobileTab = 'editor' | 'tasks' | 'chat' | 'players';
 
@@ -46,6 +47,7 @@ export default function GamePage({ params }: Props) {
   const { handleCursorMove } = useEditor(socket, roomId);
   const { callMeeting } = useVoting(socket, roomId);
   const addSystemMessage = useChatStore((s) => s.addSystemMessage);
+  useBgm(game?.phase, socket, !!meeting);
 
   // Graceful disconnect on tab close / navigation.
   //
@@ -156,8 +158,8 @@ export default function GamePage({ params }: Props) {
         {/* Center: Code editor */}
         <div className="flex-1 flex flex-col gap-2 min-w-0">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xs font-mono px-2 py-1 rounded"
-              style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+            <span className="text-xs font-mono px-2.5 py-1 rounded-full font-medium"
+              style={{ background: 'rgba(28,25,23,0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(28,25,23,0.15)', boxShadow: 'none' }}>
               {game.language}
             </span>
             <div className="flex-1" />
@@ -200,8 +202,8 @@ export default function GamePage({ params }: Props) {
           {mobileTab === 'editor' && (
             <div className="h-full flex flex-col gap-2">
               <div className="flex items-center gap-2 flex-shrink-0 pt-1">
-                <span className="text-xs font-mono px-2 py-1 rounded"
-                  style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                <span className="text-xs font-mono px-2.5 py-1 rounded-full font-medium"
+                  style={{ background: 'rgba(28,25,23,0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(28,25,23,0.15)', boxShadow: 'none' }}>
                   {game.language}
                 </span>
                 <div className="flex-1" />

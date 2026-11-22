@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { blogPosts, blogCategories, BlogPost } from '@/lib/blog-data';
+import { formatDate } from '@/lib/dateUtils';
 
 const categoryColors: Record<string, string> = {
   'Game Design': '#2563eb',
@@ -16,11 +17,7 @@ const categoryColors: Record<string, string> = {
 
 function BlogCard({ post }: { post: BlogPost }) {
   const color = categoryColors[post.category] || '#2563eb';
-  const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = formatDate(post.date, 'long');
 
   return (
     <Link href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>

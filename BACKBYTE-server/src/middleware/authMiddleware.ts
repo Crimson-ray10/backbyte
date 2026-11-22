@@ -36,6 +36,7 @@ export async function authMiddleware(
           email: decoded.email ?? `${decoded.sub}@codecrew.dev`,
           displayName: decoded.name ?? 'Player',
           avatarUrl: decoded.picture ?? '',
+          lastSeen: new Date(),
         },
         $setOnInsert: {
           googleId: decoded.sub,
@@ -44,7 +45,8 @@ export async function authMiddleware(
       { upsert: true, new: true }
     );
 
-    req.userId = user._id.toString();
+    // Keep userId consistent across HTTP and WebSocket as decoded.sub (user.googleId)
+    req.userId = decoded.sub;
     req.userDoc = user;
     next();
   } catch {

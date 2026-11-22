@@ -28,7 +28,7 @@ export function ImposterActions({ socket, roomCode, players, myUserId }: Props) 
     <div className="game-panel p-3 space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#ef4444' }}>
+        <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#b91c1c' }}>
           😈 Sabotage
         </p>
         {!isReady && (
@@ -123,21 +123,22 @@ function SabotageButton({
 }) {
   return (
     <motion.button
-      whileTap={isReady ? { scale: 0.95 } : {}}
+      whileTap={isReady ? { scale: 0.98 } : {}}
       onClick={isReady ? onClick : undefined}
       className={`w-full flex items-center gap-1.5 rounded-lg transition-all ${small ? 'px-2 py-1.5' : 'px-3 py-2'}`}
       style={{
-        background: isReady ? 'rgba(239,68,68,0.12)' : 'var(--bg-hover)',
-        border: `1px solid ${isReady ? 'rgba(239,68,68,0.4)' : 'var(--border)'}`,
+        background: isReady ? 'rgba(220, 38, 38, 0.1)' : 'var(--bg-hover)',
+        border: `1px solid ${isReady ? 'rgba(220, 38, 38, 0.25)' : 'var(--border)'}`,
         cursor: isReady ? 'pointer' : 'not-allowed',
         opacity: isReady ? 1 : 0.5,
+        boxShadow: 'none',
       }}
     >
       <span style={{ fontSize: small ? 12 : 14 }}>{icon}</span>
       <div className="flex-1 min-w-0 text-left">
         <p
           className="font-medium leading-tight truncate"
-          style={{ fontSize: small ? 10 : 11, color: isReady ? '#ef4444' : 'var(--text-muted)' }}
+          style={{ fontSize: small ? 10 : 11, color: isReady ? '#b91c1c' : 'var(--text-muted)' }}
         >
           {label}
         </p>

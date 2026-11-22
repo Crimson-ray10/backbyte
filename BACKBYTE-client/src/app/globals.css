@@ -204,10 +204,10 @@ body {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Glow effects (used in game) */
-.glow-blue { box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); }
-.glow-red { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); }
-.glow-green { box-shadow: 0 0 20px rgba(22, 163, 74, 0.3); }
+/* Flat translucent accent borders - zero glow */
+.glow-blue { border-color: rgba(37, 99, 235, 0.4); box-shadow: none; }
+.glow-red { border-color: rgba(220, 38, 38, 0.4); box-shadow: none; }
+.glow-green { border-color: rgba(22, 163, 74, 0.4); box-shadow: none; }
 
 /* Pulse animation */
 @keyframes pulse-ring {

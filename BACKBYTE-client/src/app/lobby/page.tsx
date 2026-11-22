@@ -18,7 +18,7 @@ function LobbyContent() {
       {/* Top bar */}
       <header className="flex items-center justify-between px-6 py-3 bg-[#faf8f4] border-b-[3px] border-[#1c1917]">
         <span className="pixel-font text-sm" style={{ color: 'var(--text-primary)' }}>
-          DEV<span style={{ color: 'var(--accent-blue)' }}>CEPTION</span>
+          BACK<span style={{ color: 'var(--accent-blue)' }}>BYTE</span>
         </span>
         <div className="flex items-center gap-4">
           <span className="font-bold text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -72,7 +72,7 @@ function LobbyContent() {
           className="text-center"
         >
           <h1 className="pixel-font text-2xl mb-3" style={{ color: 'var(--text-primary)', lineHeight: 2 }}>
-            DEV<span style={{ color: 'var(--accent-blue)' }}>CEPTION</span>
+            BACK<span style={{ color: 'var(--accent-blue)' }}>BYTE</span>
           </h1>
           <p className="text-sm" style={{ color: 'var(--text-muted)', fontFamily: 'Space Mono, monospace' }}>
             Code together. Find the imposter.

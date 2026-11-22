@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BlogPost, blogPosts } from '@/lib/blog-data';
+import { formatDate } from '@/lib/dateUtils';
 import { AUTHOR } from '@/lib/site';
 import { useCinematic } from '@/components/landing/CinematicProvider';
 
@@ -25,11 +26,7 @@ export default function BlogPostClient({ post }: { post: BlogPost }) {
   }, []);
 
   const color = categoryColors[post.category] || '#2563eb';
-  const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const formattedDate = formatDate(post.date, 'long');
 
   // Related posts (same category, excluding current)
   const related = blogPosts

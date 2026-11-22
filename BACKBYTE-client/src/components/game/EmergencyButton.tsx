@@ -31,18 +31,21 @@ export function EmergencyButton({ onCall, disabled }: Props) {
 
   return (
     <motion.button
-      whileHover={!isDisabled ? { scale: 1.05 } : {}}
-      whileTap={!isDisabled ? { scale: 0.95 } : {}}
+      whileHover={!isDisabled ? { opacity: 0.9 } : {}}
+      whileTap={!isDisabled ? { scale: 0.98 } : {}}
       onClick={handle}
       disabled={isDisabled}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all"
+      className="flex items-center gap-2 px-3.5 py-1.5 rounded-full font-bold text-xs transition-all tracking-wide"
       style={{
-        background: isDisabled ? 'var(--bg-hover)' : 'rgba(239,68,68,0.2)',
-        border: `1px solid ${isDisabled ? 'var(--border)' : '#ef4444'}`,
-        color: isDisabled ? 'var(--text-muted)' : '#ef4444',
+        background: isDisabled ? 'var(--bg-hover)' : 'rgba(220, 38, 38, 0.12)',
+        border: `1px solid ${isDisabled ? 'rgba(28, 25, 23, 0.15)' : 'rgba(220, 38, 38, 0.25)'}`,
+        color: isDisabled ? 'var(--text-muted)' : '#b91c1c',
+        boxShadow: 'none',
+        textShadow: 'none',
       }}
     >
-      🚨 {onCooldown ? `Meeting (${secsLeft}s)` : 'Emergency Meeting'}
+      <span className="text-sm">🚨</span>
+      <span>{onCooldown ? `Meeting (${secsLeft}s)` : 'Emergency Meeting'}</span>
     </motion.button>
   );
 }

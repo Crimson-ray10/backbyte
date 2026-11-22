@@ -33,18 +33,9 @@ app.use((_req, res, next) => {
 // ─── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet());
 
-const allowedOrigins = [env.CLIENT_ORIGIN, 'http://localhost:3000'];
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow no-origin requests (curl, Postman, server-to-server)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS: origin ${origin} not allowed`));
-      }
-    },
+    origin: true,
     credentials: true,
   })
 );
@@ -107,7 +98,7 @@ async function shutdown(signal: string): Promise<void> {
 }
 
 process.on('SIGTERM', () => void shutdown('SIGTERM'));
-process.on('SIGINT',  () => void shutdown('SIGINT'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
 
 // Catch unhandled promise rejections and log them without crashing
 process.on('unhandledRejection', (reason) => {

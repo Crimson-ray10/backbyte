@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Timer } from '@/components/ui/Timer';
 import { GameState } from '@/types/game';
+import { useBgm } from '@/hooks/useBgm';
 
 interface Props {
   game: GameState;
@@ -11,6 +12,7 @@ interface Props {
 
 export function SharedProgress({ game, myRole }: Props) {
   const completedTasks = game.tasks.filter((t) => t.isCompleted).length;
+  const { isMuted, toggleMute } = useBgm();
 
   return (
     <div className="flex items-center gap-4 px-4 py-2 game-panel">
@@ -50,15 +52,36 @@ export function SharedProgress({ game, myRole }: Props) {
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        className="px-3 py-1 rounded-full text-xs font-bold"
+        className="px-3.5 py-1 rounded-full text-xs font-bold tracking-wide flex items-center gap-1.5"
         style={{
-          background: myRole === 'imposter' ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.2)',
-          color: myRole === 'imposter' ? '#ef4444' : '#22c55e',
-          border: `1px solid ${myRole === 'imposter' ? '#ef4444' : '#22c55e'}`,
+          background: myRole === 'imposter' ? 'rgba(220, 38, 38, 0.12)' : 'rgba(22, 163, 74, 0.12)',
+          color: myRole === 'imposter' ? '#b91c1c' : '#15803d',
+          border: `1px solid ${myRole === 'imposter' ? 'rgba(220, 38, 38, 0.25)' : 'rgba(22, 163, 74, 0.25)'}`,
+          boxShadow: 'none',
+          textShadow: 'none',
         }}
       >
-        {myRole === 'imposter' ? '😈 IMPOSTER' : '👨‍💻 CODER'}
+        <span>{myRole === 'imposter' ? '😈' : '👨‍💻'}</span>
+        <span>{myRole === 'imposter' ? 'IMPOSTER' : 'CODER'}</span>
       </motion.div>
+
+      {/* Audio BGM toggle button */}
+      <div className="w-px h-6" style={{ background: 'var(--border)' }} />
+      <button
+        onClick={toggleMute}
+        title={isMuted ? 'Unmute Background Music' : 'Mute Background Music'}
+        className="px-2.5 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1 transition-all"
+        style={{
+          background: isMuted ? 'rgba(28, 25, 23, 0.05)' : 'rgba(37, 99, 235, 0.12)',
+          color: isMuted ? 'var(--text-muted)' : '#1d4ed8',
+          border: `1px solid ${isMuted ? 'rgba(28, 25, 23, 0.15)' : 'rgba(37, 99, 235, 0.25)'}`,
+          cursor: 'pointer',
+          boxShadow: 'none',
+        }}
+      >
+        <span>{isMuted ? '🔇' : '🎵'}</span>
+        <span className="hidden sm:inline">{isMuted ? 'MUTE' : 'BGM'}</span>
+      </button>
     </div>
   );
 }

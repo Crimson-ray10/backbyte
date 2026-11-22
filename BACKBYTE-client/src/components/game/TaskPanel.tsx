@@ -240,11 +240,12 @@ export function TaskPanel({ tasks, myUserId, socket, roomCode, language = 'javas
                               key={v.index}
                               className="flex items-start gap-2 px-2 py-1 rounded"
                               style={{
-                                background: v.passed ? 'rgba(17,127,45,0.12)' : 'rgba(197,17,17,0.12)',
-                                border: `1px solid ${v.passed ? 'rgba(17,127,45,0.35)' : 'rgba(197,17,17,0.35)'}`,
+                                background: v.passed ? 'rgba(22,163,74,0.08)' : 'rgba(220,38,38,0.08)',
+                                border: `1px solid ${v.passed ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'}`,
+                                boxShadow: 'none',
                               }}
                             >
-                              <span style={{ color: v.passed ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+                              <span style={{ color: v.passed ? '#15803d' : '#b91c1c' }}>
                                 {v.passed ? '✓' : '✗'}
                               </span>
                               <div className="flex-1 min-w-0" style={{ color: 'var(--text-secondary)' }}>
@@ -252,7 +253,7 @@ export function TaskPanel({ tasks, myUserId, socket, roomCode, language = 'javas
                                 <div>
                                   expected: <span style={{ color: 'var(--text-primary)' }}>{v.expected}</span>
                                   {' · '}
-                                  got: <span style={{ color: v.passed ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+                                  got: <span style={{ color: v.passed ? '#15803d' : '#b91c1c' }}>
                                     {v.error ? `⚠ ${v.error}` : v.actual || '(empty)'}
                                   </span>
                                 </div>

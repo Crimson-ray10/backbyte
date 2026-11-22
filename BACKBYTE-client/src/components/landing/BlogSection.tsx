@@ -4,13 +4,14 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 import { blogPosts } from '@/lib/blog-data';
+import { formatDate } from '@/lib/dateUtils';
 
 // Map the blogPosts to the format needed for the landing page
 const POSTS = blogPosts.slice(0, 10).map(post => ({
   slug: post.slug,
   title: post.title,
   excerpt: post.excerpt,
-  date: new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+  date: formatDate(post.date, 'short'),
   readTime: `${post.readTime} MIN READ`,
   tag: post.category.toUpperCase(),
   color: getCategoryColor(post.category),

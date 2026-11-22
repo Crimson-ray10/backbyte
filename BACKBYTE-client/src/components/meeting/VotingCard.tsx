@@ -23,10 +23,11 @@ export function VotingCard({ player, isMe, hasVoted, myVote, onVote, isSkip }: P
       onClick={canVote ? () => onVote(targetId) : undefined}
       className="flex flex-col items-center p-4 rounded-xl transition-all"
       style={{
-        background: isVoted ? 'rgba(239,68,68,0.2)' : 'var(--bg-hover)',
-        border: `2px solid ${isVoted ? '#ef4444' : 'var(--border)'}`,
+        background: isVoted ? 'rgba(220,38,38,0.12)' : 'var(--bg-hover)',
+        border: `2px solid ${isVoted ? '#b91c1c' : 'var(--border)'}`,
         cursor: canVote ? 'pointer' : 'default',
         opacity: myVote && !isVoted ? 0.6 : 1,
+        boxShadow: 'none',
       }}
     >
       {isSkip ? (

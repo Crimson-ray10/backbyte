@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { formatDate } from '@/lib/dateUtils';
 
 // Honest build log for a pre-launch project. No invented metrics, users, or
 // shipped-but-not-real features — every entry maps to real commits in the repo
@@ -80,7 +81,7 @@ export default function DevlogClient() {
   return (
     <div style={{ background: '#faf8f4', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      
+
       <main style={{ flex: 1, padding: '120px 24px 80px', maxWidth: 800, margin: '0 auto', width: '100%' }}>
         <div style={{ marginBottom: 60, borderBottom: '3px solid #1c1917', paddingBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
@@ -98,7 +99,7 @@ export default function DevlogClient() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
           {DEVLOG_ENTRIES.map((entry, idx) => (
-            <article 
+            <article
               key={idx}
               style={{
                 background: '#fff',
@@ -117,7 +118,7 @@ export default function DevlogClient() {
                   </span>
                 </div>
                 <time style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#78716c' }}>
-                  {new Date(entry.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  {formatDate(entry.date, 'long')}
                 </time>
               </div>
               <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 16, color: '#292524', lineHeight: 1.8 }}>
@@ -127,7 +128,7 @@ export default function DevlogClient() {
           ))}
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

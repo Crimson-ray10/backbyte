@@ -14,12 +14,18 @@ export async function updateMe(req: AuthRequest, res: Response): Promise<void> {
   if (skillLevel) update.skillLevel = skillLevel;
   if (preferredLanguages) update.preferredLanguages = preferredLanguages;
 
-  const user = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
+  const user = await User.findByIdAndUpdate(req.userDoc?._id, { $set: update }, { new: true });
   res.json(user);
 }
 
 export async function getProfile(req: AuthRequest, res: Response): Promise<void> {
-  const user = await User.findById(req.params.userId).select('displayName avatarUrl stats skillLevel');
+  const rawId = req.params.userId;
+  const userIdParam = Array.isArray(rawId) ? rawId[0] : rawId;
+  const query = userIdParam.match(/^[0-9a-fA-F]{24}$/)
+    ? { $or: [{ _id: userIdParam }, { googleId: userIdParam }] }
+    : { googleId: userIdParam };
+
+  const user = await User.findOne(query).select('displayName avatarUrl stats skillLevel');
   if (!user) {
     res.status(404).json({ error: 'User not found' });
     return;

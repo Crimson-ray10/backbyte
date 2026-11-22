@@ -25,10 +25,12 @@ export function PlayerList({ players, myUserId, testCases = [] }: Props) {
         {players.map((player) => (
           <div
             key={player.userId}
-            className="flex items-center gap-2 p-2 rounded-lg"
+            className="flex items-center gap-2 p-2 rounded-lg transition-colors"
             style={{
-              background: player.userId === myUserId ? 'var(--bg-hover)' : 'transparent',
+              background: player.userId === myUserId ? 'rgba(28, 25, 23, 0.08)' : 'transparent',
+              border: player.userId === myUserId ? '1px solid rgba(28, 25, 23, 0.15)' : '1px solid transparent',
               opacity: player.isAlive && player.isConnected ? 1 : 0.4,
+              boxShadow: 'none',
             }}
           >
             <Avatar src={player.avatarUrl} name={player.displayName} color={player.color} size="sm" />
@@ -40,12 +42,15 @@ export function PlayerList({ players, myUserId, testCases = [] }: Props) {
                 )}
               </p>
               {!player.isAlive && (
-                <p className="text-xs" style={{ color: 'var(--accent-red)' }}>Ejected</p>
+                <p className="text-xs" style={{ color: '#b91c1c' }}>Ejected</p>
               )}
             </div>
             <div
               className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ background: player.isConnected && player.isAlive ? '#22c55e' : '#475569' }}
+              style={{
+                background: player.isConnected && player.isAlive ? '#16a34a' : '#78716c',
+                boxShadow: 'none',
+              }}
             />
           </div>
         ))}
@@ -59,20 +64,20 @@ export function PlayerList({ players, myUserId, testCases = [] }: Props) {
               </p>
               <span
                 className="font-mono font-bold"
-                style={{ fontSize: '10px', color: allPassed ? '#22c55e' : 'var(--text-muted)' }}
+                style={{ fontSize: '10px', color: allPassed ? '#16a34a' : 'var(--text-muted)' }}
               >
                 {passedCount}/{total}
               </span>
             </div>
 
             {/* Progress bar */}
-            <div className="mx-2 mb-2 rounded-full overflow-hidden" style={{ height: 4, background: 'var(--bg-secondary, #1a1a2e)' }}>
+            <div className="mx-2 mb-2 rounded-full overflow-hidden" style={{ height: 4, background: 'rgba(28, 25, 23, 0.12)' }}>
               <motion.div
                 animate={{ width: `${progressPct}%` }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 style={{
                   height: '100%',
-                  background: allPassed ? '#22c55e' : 'linear-gradient(90deg, #3b82f6, #22c55e)',
+                  background: allPassed ? '#16a34a' : 'linear-gradient(90deg, #2563eb, #16a34a)',
                   borderRadius: 9999,
                 }}
               />
@@ -83,12 +88,16 @@ export function PlayerList({ players, myUserId, testCases = [] }: Props) {
               <motion.div
                 key={tc.id}
                 layout
-                className="flex items-start gap-2 px-2 py-1 rounded"
-                style={{ background: tc.passed ? 'rgba(34,197,94,0.06)' : 'transparent' }}
+                className="flex items-start gap-2 px-2 py-1 rounded transition-colors"
+                style={{
+                  background: tc.passed ? 'rgba(22, 163, 74, 0.08)' : 'transparent',
+                  border: tc.passed ? '1px solid rgba(22, 163, 74, 0.2)' : '1px solid transparent',
+                  boxShadow: 'none',
+                }}
               >
                 <span
                   className="flex-shrink-0 font-bold mt-0.5"
-                  style={{ fontSize: '11px', color: tc.passed ? '#22c55e' : '#475569', minWidth: 12 }}
+                  style={{ fontSize: '11px', color: tc.passed ? '#15803d' : '#78716c', minWidth: 12 }}
                 >
                   {tc.passed ? '✓' : '○'}
                 </span>

@@ -7,6 +7,25 @@ import { randomUUID } from 'crypto';
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
+      id: 'google-demo',
+      name: 'Google Demo',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email || 'developer.google@gmail.com';
+        const rawName = email.split('@')[0].replace(/[._-]/g, ' ');
+        const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        const googleId = `google_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
+        return {
+          id: googleId,
+          name: `${displayName} (Google)`,
+          email: email,
+          image: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(displayName)}`,
+        };
+      },
+    }),
+    CredentialsProvider({
       id: 'guest',
       name: 'Guest',
       credentials: {

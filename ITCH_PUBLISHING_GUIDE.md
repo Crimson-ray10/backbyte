@@ -53,7 +53,7 @@ This guide walks you through publishing **BACKBYTE** on **[itch.io](https://itch
 2. Click **Upload files**.
 3. Select the file:
    ```
-   c:\Users\ROHIT\Downloads\backbyte\itch\backbyte-itch.zip
+   c:\second\rough\backbyte\backbyte-main\itch\backbyte-itch.zip
    ```
 4. Once uploaded, tick the checkbox:
    * **☑ This file will be played in the browser**
@@ -101,7 +101,7 @@ Because itch.io games run inside an HTTPS iframe (`https://html-classic.itch.zon
 ## 🛠️ Testing Locally Before Publishing
 
 You can test the itch package on your machine right now:
-* Simply double-click `c:\Users\ROHIT\Downloads\backbyte\itch\index.html` to open it in Chrome, Edge, or Firefox.
+* Simply double-click `c:\second\rough\backbyte\backbyte-main\itch\index.html` to open it in Chrome, Edge, or Firefox.
 * Or run a local HTTP server:
   ```bash
   python -m http.server 8080 --directory itch
