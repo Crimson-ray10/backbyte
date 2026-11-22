@@ -45,7 +45,7 @@ export function EmergencyButton({ onCall, disabled }: Props) {
       }}
     >
       <span className="text-sm">🚨</span>
-      <span>{onCooldown ? `Meeting (${secsLeft}s)` : 'Emergency Meeting'}</span>
+      <span suppressHydrationWarning>{onCooldown ? `Meeting (${secsLeft}s)` : 'Emergency Meeting'}</span>
     </motion.button>
   );
 }

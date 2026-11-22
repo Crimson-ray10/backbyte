@@ -4,9 +4,11 @@ import { bgm } from '@/lib/bgm';
 import { AppSocket } from '@/lib/socket';
 
 export function useBgm(phase?: string, socket?: AppSocket | null, isMeetingActive?: boolean) {
-  const [isMuted, setIsMuted] = useState(bgm.getMuted());
+  // Start with false so server rendering and initial client hydration match perfectly
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
+    setIsMuted(bgm.getMuted());
     return bgm.subscribe((muted) => setIsMuted(muted));
   }, []);
 

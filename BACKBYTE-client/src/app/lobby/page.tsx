@@ -21,7 +21,7 @@ function LobbyContent() {
           BACK<span style={{ color: 'var(--accent-blue)' }}>BYTE</span>
         </span>
         <div className="flex items-center gap-4">
-          <span className="font-bold text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <span suppressHydrationWarning className="font-bold text-sm" style={{ color: 'var(--text-secondary)' }}>
             {user?.name ?? 'Player'}
           </span>
           <button

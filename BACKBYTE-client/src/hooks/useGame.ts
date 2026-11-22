@@ -20,6 +20,15 @@ export function useGameEvents(socket: AppSocket | null, roomCode: string) {
     // Room events
     socket.on('room:state', (game) => {
       gameStore.setGame(game);
+      // Clean up any stale remote cursors for disconnected or departed players
+      const connectedUserIds = new Set(game.players.filter((p) => p.isConnected).map((p) => p.userId));
+      const currentCursors = editorStore.cursors;
+      currentCursors.forEach((_, cUserId) => {
+        if (!connectedUserIds.has(cUserId)) {
+          editorStore.removeCursor(cUserId);
+        }
+      });
+
       // Only initialize the editor from room:state when we're in the lobby.
       // During an active game, room:state can fire for reconnects/joins and
       // must NOT re-insert the template — the live Y.Doc is the source of truth.
@@ -28,11 +37,17 @@ export function useGameEvents(socket: AppSocket | null, roomCode: string) {
       }
     });
     socket.on('room:player-joined', gameStore.addPlayer);
-    socket.on('room:player-left', ({ userId }) => gameStore.removePlayer(userId));
+    socket.on('room:player-left', ({ userId }) => {
+      gameStore.removePlayer(userId);
+      editorStore.removeCursor(userId);
+    });
     // Intermediate state during the reconnect grace window — same visual treatment
     // as `room:player-left` (grayed-out dot) but without a "left the game" chat.
     // If the player reconnects in time, a subsequent `room:state` restores them.
-    socket.on('room:player-disconnected', ({ userId }) => gameStore.removePlayer(userId));
+    socket.on('room:player-disconnected', ({ userId }) => {
+      gameStore.removePlayer(userId);
+      editorStore.removeCursor(userId);
+    });
     socket.on('room:ready-update', ({ userId }) => gameStore.setPlayerReady(userId));
     socket.on('room:settings-updated', ({ settings }) => gameStore.setSettings(settings));
 

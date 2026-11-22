@@ -26,12 +26,17 @@ class RemoteCursorWidget implements editor.IContentWidget {
     this.domNode.style.backgroundColor = color;
     this.domNode.style.color = '#fff';
     this.domNode.style.fontSize = '10px';
-    this.domNode.style.padding = '2px 4px';
-    this.domNode.style.borderRadius = '2px';
+    this.domNode.style.fontWeight = 'bold';
+    this.domNode.style.padding = '1px 4px';
+    this.domNode.style.borderRadius = '3px';
     this.domNode.style.whiteSpace = 'nowrap';
     this.domNode.style.pointerEvents = 'none';
     this.domNode.style.zIndex = '50';
     this.domNode.style.fontFamily = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace";
+    this.domNode.style.transform = 'translateY(-100%)';
+    this.domNode.style.marginBottom = '2px';
+    this.domNode.style.opacity = '0.92';
+    this.domNode.style.lineHeight = '1.2';
   }
 
   getId(): string {
@@ -46,7 +51,7 @@ class RemoteCursorWidget implements editor.IContentWidget {
     if (!this.position) return null;
     return {
       position: this.position,
-      preference: [1] // 1 = ABOVE
+      preference: [1, 2] // 1 = ABOVE, 2 = BELOW
     };
   }
 

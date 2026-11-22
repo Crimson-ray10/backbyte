@@ -18,7 +18,7 @@ export function PlayerList({ players, myUserId, testCases = [] }: Props) {
     <div className="game-panel h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
         <h3 className="font-bold text-sm uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-          Players ({players.filter((p) => p.isConnected).length})
+          Players ({players.filter((p) => p.isConnected).length}/{players.length})
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">

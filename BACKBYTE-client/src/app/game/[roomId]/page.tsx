@@ -1,8 +1,8 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameEvents } from '@/hooks/useGame';
 import { useEditor } from '@/hooks/useEditor';
@@ -12,7 +12,6 @@ import { useMeetingStore } from '@/store/meetingStore';
 import { useChatStore } from '@/store/chatStore';
 
 import { RoleReveal } from '@/components/game/RoleReveal';
-import { CodeEditor } from '@/components/game/CodeEditor';
 import { TaskPanel } from '@/components/game/TaskPanel';
 import { PlayerList } from '@/components/game/PlayerList';
 import { SharedProgress } from '@/components/game/SharedProgress';
@@ -25,6 +24,18 @@ import { GameOverScreen } from '@/components/game/GameOverScreen';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DirectJoinModal } from '@/components/game/DirectJoinModal';
 import { useBgm } from '@/hooks/useBgm';
+
+const CodeEditor = dynamic(
+  () => import('@/components/game/CodeEditor').then((m) => m.CodeEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex-1 flex items-center justify-center game-panel">
+        <LoadingSpinner size={32} />
+      </div>
+    ),
+  }
+);
 
 type MobileTab = 'editor' | 'tasks' | 'chat' | 'players';
 
@@ -42,6 +53,11 @@ export default function GamePage({ params }: Props) {
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('editor');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useGameEvents(socket, roomId);
   const { handleCursorMove } = useEditor(socket, roomId);
@@ -96,7 +112,7 @@ export default function GamePage({ params }: Props) {
     [handleCursorMove]
   );
 
-  if (status === 'loading') {
+  if (!mounted || status === 'loading') {
     return (
       <div className="pixel-bg min-h-screen flex items-center justify-center">
         <LoadingSpinner size={48} />

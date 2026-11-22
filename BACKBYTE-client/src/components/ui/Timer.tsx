@@ -12,6 +12,7 @@ export function Timer({ remainingMs }: TimerProps) {
 
   return (
     <span
+      suppressHydrationWarning
       className="font-mono font-bold tabular-nums text-lg"
       style={{ color: isLow ? 'var(--accent-red)' : 'var(--text-primary)' }}
     >

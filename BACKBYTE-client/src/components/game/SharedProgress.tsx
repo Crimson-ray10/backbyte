@@ -61,8 +61,8 @@ export function SharedProgress({ game, myRole }: Props) {
           textShadow: 'none',
         }}
       >
-        <span>{myRole === 'imposter' ? '😈' : '👨‍💻'}</span>
-        <span>{myRole === 'imposter' ? 'IMPOSTER' : 'CODER'}</span>
+        <span suppressHydrationWarning>{myRole === 'imposter' ? '😈' : '👨‍💻'}</span>
+        <span suppressHydrationWarning>{myRole === 'imposter' ? 'IMPOSTER' : 'CODER'}</span>
       </motion.div>
 
       {/* Audio BGM toggle button */}
@@ -79,8 +79,8 @@ export function SharedProgress({ game, myRole }: Props) {
           boxShadow: 'none',
         }}
       >
-        <span>{isMuted ? '🔇' : '🎵'}</span>
-        <span className="hidden sm:inline">{isMuted ? 'MUTE' : 'BGM'}</span>
+        <span suppressHydrationWarning>{isMuted ? '🔇' : '🎵'}</span>
+        <span suppressHydrationWarning className="hidden sm:inline">{isMuted ? 'MUTE' : 'BGM'}</span>
       </button>
     </div>
   );

@@ -20,6 +20,11 @@ export default function WaitingRoomPage({ params }: Props) {
   const socket = useSocket();
   const { game } = useGameStore();
   const [isReady, setIsReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useGameEvents(socket, roomId);
 
@@ -49,7 +54,7 @@ export default function WaitingRoomPage({ params }: Props) {
   const isAdmin = !!game && game.players.length > 0 &&
     game.players[0].userId === userId;
 
-  if (status === 'loading') {
+  if (!mounted || status === 'loading') {
     return (
       <div className="pixel-bg min-h-screen flex items-center justify-center">
         <LoadingSpinner size={40} />
