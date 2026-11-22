@@ -1488,7 +1488,7 @@
         this.ctx = null;
         this.enabled = true;
         this.bgm = null;
-        this.bgmPlaying = false;
+        this.bgmPlaying = true;
         this.pauseReasons = new Set();
         this.pauseTimeout = null;
 
@@ -1499,12 +1499,22 @@
             this.bgm?.play().catch(() => {});
           }
           window.removeEventListener('click', unlock);
+          window.removeEventListener('pointerdown', unlock);
           window.removeEventListener('keydown', unlock);
           window.removeEventListener('touchstart', unlock);
         };
         window.addEventListener('click', unlock, { passive: true });
+        window.addEventListener('pointerdown', unlock, { passive: true });
         window.addEventListener('keydown', unlock, { passive: true });
         window.addEventListener('touchstart', unlock, { passive: true });
+
+        // Also try autoplay immediately
+        setTimeout(() => {
+          this.init();
+          if (this.bgmPlaying && this.enabled) {
+            this.bgm?.play().catch(() => {});
+          }
+        }, 200);
 
         // Auto pause on tab switch
         document.addEventListener('visibilitychange', () => {
@@ -2516,7 +2526,7 @@
 
     document.getElementById('btn-return-menu').addEventListener('click', () => {
       sound.playClick();
-      sound.stopBgm();
+      sound.playBgm();
       showView('menu');
     });
 

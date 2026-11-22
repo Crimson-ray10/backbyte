@@ -138,7 +138,7 @@ export function CodeEditor({ roomCode, onCursorMove, language, readOnly = false,
     styleEl.textContent = css;
 
     if (!editorRef.current) return;
-    
+
     const newDecorations: editor.IModelDeltaDecoration[] = [];
     cursors.forEach((c) => {
       const safeId = c.userId.replace(/[^a-zA-Z0-9]/g, '');
@@ -184,7 +184,7 @@ export function CodeEditor({ roomCode, onCursorMove, language, readOnly = false,
     if (ydocRef.current) {
       ydocRef.current.destroy();
     }
-    
+
     const ydoc = new Y.Doc();
     ydocRef.current = ydoc;
 

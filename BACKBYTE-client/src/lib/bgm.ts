@@ -3,7 +3,7 @@
 class BgmAudioController {
   private audio: HTMLAudioElement | null = null;
   private isMuted: boolean = false;
-  private isPlaying: boolean = false;
+  private isPlaying: boolean = true;
   private pauseTimeout: NodeJS.Timeout | null = null;
   private pauseReasons: Set<string> = new Set();
   private initialized: boolean = false;
@@ -13,18 +13,30 @@ class BgmAudioController {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('backbyte_bgm_muted');
       this.isMuted = saved === 'true';
+      this.isPlaying = true;
 
-      // Auto-unlock on first user interaction
-      const unlock = () => {
+      const tryStart = () => {
         this.init();
-        if (!this.isMuted && this.isPlaying) {
+        if (!this.isMuted && this.isPlaying && this.pauseReasons.size === 0) {
           this.audio?.play().catch(() => {});
         }
+      };
+
+      // Try autoplay on startup
+      tryStart();
+
+      // Browsers require a user interaction to start audio output.
+      // We listen to any user gesture across the document to immediately unlock audio.
+      const unlock = () => {
+        tryStart();
         window.removeEventListener('click', unlock);
+        window.removeEventListener('pointerdown', unlock);
         window.removeEventListener('keydown', unlock);
         window.removeEventListener('touchstart', unlock);
       };
+
       window.addEventListener('click', unlock, { passive: true });
+      window.addEventListener('pointerdown', unlock, { passive: true });
       window.addEventListener('keydown', unlock, { passive: true });
       window.addEventListener('touchstart', unlock, { passive: true });
 
@@ -46,9 +58,17 @@ class BgmAudioController {
       this.audio.loop = true;
       this.audio.volume = 0.28;
       this.audio.preload = 'auto';
+
+      // Fallback loop trigger in case browser loop event stutters
+      this.audio.addEventListener('ended', () => {
+        if (this.isPlaying && !this.isMuted && this.pauseReasons.size === 0) {
+          this.audio?.play().catch(() => {});
+        }
+      });
+
       this.initialized = true;
     } catch {
-      // AudioContext / Audio not supported or blocked
+      // Audio not supported or blocked
     }
   }
 
@@ -56,9 +76,7 @@ class BgmAudioController {
     this.init();
     this.isPlaying = true;
     if (this.isMuted || this.pauseReasons.size > 0 || !this.audio) return;
-    this.audio.play().catch(() => {
-      // Will play on next user interaction
-    });
+    this.audio.play().catch(() => {});
   }
 
   /**
@@ -116,7 +134,9 @@ class BgmAudioController {
 
     if (this.isMuted) {
       this.audio?.pause();
-    } else if (this.isPlaying && this.pauseReasons.size === 0) {
+    } else {
+      this.isPlaying = true;
+      this.pauseReasons.clear();
       this.audio?.play().catch(() => {});
     }
 
