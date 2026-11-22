@@ -259,7 +259,7 @@
     }
     .role-cards-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       width: 100%;
       margin-bottom: 32px;
@@ -1086,23 +1086,43 @@
         <div class="role-cards-grid">
           <!-- Developer Card -->
           <div class="role-card dev-card" id="card-play-dev">
-            <h3><span>🧑‍💻</span> PLAY AS DEVELOPER</h3>
+            <div style="font-size: 8px; font-family: var(--font-pixel); color: var(--accent-blue); margin-bottom: 8px;">
+              [BROWSER SOLO MODE]
+            </div>
+            <h3><span>🧑‍💻</span> PLAY DEVELOPER</h3>
             <p>
               Work alongside AI teammates to solve algorithms, spot suspicious code insertions, call emergency meetings, and vote out the saboteur.
             </p>
             <button class="pixel-btn pixel-btn-blue" style="width: 100%;">
-              START AS DEVELOPER →
+              START SOLO DEV →
             </button>
           </div>
 
           <!-- Impostor Card -->
           <div class="role-card imposter-card" id="card-play-imposter">
-            <h3><span>🕵️</span> PLAY AS IMPOSTOR</h3>
+            <div style="font-size: 8px; font-family: var(--font-pixel); color: var(--accent-red); margin-bottom: 8px;">
+              [BROWSER SOLO MODE]
+            </div>
+            <h3><span>🕵️</span> PLAY IMPOSTOR</h3>
             <p>
               Pretend to collaborate while secretly injecting subtle bugs, blurring developer editors, deploying fake hints, and dodging accusations!
             </p>
             <button class="pixel-btn pixel-btn-red" style="width: 100%;">
-              START AS IMPOSTOR →
+              START SOLO IMPOSTOR →
+            </button>
+          </div>
+
+          <!-- Multiplayer Card -->
+          <div class="role-card" id="card-play-online" style="border-color: var(--accent-green); cursor: pointer;">
+            <div style="font-size: 8px; font-family: var(--font-pixel); color: var(--accent-green); margin-bottom: 8px;">
+              [ONLINE WEBSOCKETS]
+            </div>
+            <h3><span>🌐</span> MULTIPLAYER</h3>
+            <p>
+              Play with real friends! Create private lobbies, collaborative Monaco code editor, live chat, and emergency meetings over WebSockets.
+            </p>
+            <button class="pixel-btn pixel-btn-green" style="width: 100%;">
+              PLAY MULTIPLAYER →
             </button>
           </div>
         </div>
@@ -1379,43 +1399,39 @@
     <!-- VIEW 5: ONLINE MULTIPLAYER                                -->
     <!-- ========================================================= -->
     <section class="view-section" id="view-online">
-      <div class="online-container">
-        <div class="online-config-card">
-          <div class="section-label" style="border: 2px solid var(--accent-green); color: var(--accent-green); font-family: var(--font-pixel); font-size: 8px; margin-bottom: 10px;">
-            ONLINE ROOM CONNECTOR
+      <div class="online-container" style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
+        <!-- Compact Toolbar -->
+        <div class="game-panel" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 10px 16px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="pixel-btn" id="btn-online-back">← MENU</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="status-badge checking" id="server-status-badge">● CHECKING...</span>
+              <span id="server-ping-text" style="font-size: 11px; color: var(--text-muted);"></span>
+            </div>
           </div>
-          <h2 class="pixel-font" style="font-size: 14px; margin-bottom: 8px;">
-            CONNECT TO LIVE BACKBYTE SERVER
-          </h2>
-          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
-            Play with your real friends over WebSockets! You can connect to your deployed BACKBYTE server (Vercel, Render, Railway, or VPS) directly inside this itch.io player or in a new browser window.
-          </p>
-
-          <label style="font-size: 11px; font-weight: bold;">BACKBYTE DEPLOYMENT URL:</label>
-          <div class="server-input-group">
-            <input type="text" class="pixel-input" id="server-url-input" value="https://platinum-missions-strategy-geo.trycloudflare.com" placeholder="https://your-backbyte-app.vercel.app">
-            <button class="pixel-btn pixel-btn-blue" id="btn-ping-server">
-              TEST PING
-            </button>
-            <button class="pixel-btn pixel-btn-green" id="btn-launch-online">
-              ▶ LAUNCH IN ITCH IFRAME
-            </button>
-            <a href="https://platinum-missions-strategy-geo.trycloudflare.com" target="_blank" rel="noopener noreferrer" class="pixel-btn" id="btn-open-external">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="pixel-btn" id="btn-toggle-server-settings" style="font-size: 9px;">⚙ SERVER SETTINGS</button>
+            <a href="https://platinum-missions-strategy-geo.trycloudflare.com" target="_blank" rel="noopener noreferrer" class="pixel-btn pixel-btn-blue" id="btn-open-external" style="font-size: 9px;">
               ↗ OPEN IN NEW TAB
             </a>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 12px; margin-top: 14px;">
-            <span style="font-size: 11px;">SERVER STATUS:</span>
-            <span class="status-badge checking" id="server-status-badge">
-              ● CHECKING CONNECTIVITY...
-            </span>
-            <span id="server-ping-text" style="font-size: 11px; color: var(--text-muted);"></span>
+            <button class="pixel-btn pixel-btn-green" id="btn-reload-iframe" style="font-size: 9px;" title="Reload Game">
+              ↻ RELOAD
+            </button>
           </div>
         </div>
 
-        <!-- Embedded Live Game Container -->
-        <iframe id="online-game-iframe" class="embed-iframe-frame" src="about:blank" allow="fullscreen; autoplay; clipboard-write; encrypted-media"></iframe>
+        <!-- Collapsible Server Settings Drawer -->
+        <div id="server-settings-drawer" class="game-panel" style="display: none; padding: 14px;">
+          <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 6px;">CUSTOM BACKBYTE SERVER URL:</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" class="pixel-input" id="server-url-input" value="https://platinum-missions-strategy-geo.trycloudflare.com" placeholder="https://your-backbyte-app.vercel.app" style="flex: 1; min-width: 260px;">
+            <button class="pixel-btn pixel-btn-blue" id="btn-ping-server">TEST PING</button>
+            <button class="pixel-btn pixel-btn-green" id="btn-launch-online">APPLY &amp; RECONNECT</button>
+          </div>
+        </div>
+
+        <!-- Embedded Live Game Container (Auto-loads) -->
+        <iframe id="online-game-iframe" class="embed-iframe-frame visible" src="https://platinum-missions-strategy-geo.trycloudflare.com" allow="fullscreen; autoplay; clipboard-write; encrypted-media" style="width: 100%; height: calc(100vh - 120px); min-height: 640px; border: 2px solid var(--border); box-shadow: var(--pixel-shadow); background: #ffffff;"></iframe>
       </div>
     </section>
 
@@ -2538,6 +2554,39 @@
     const serverPingText = document.getElementById('server-ping-text');
     const onlineGameIframe = document.getElementById('online-game-iframe');
     const btnOpenExternal = document.getElementById('btn-open-external');
+    const serverSettingsDrawer = document.getElementById('server-settings-drawer');
+    const btnToggleServerSettings = document.getElementById('btn-toggle-server-settings');
+    const btnReloadIframe = document.getElementById('btn-reload-iframe');
+    const btnOnlineBack = document.getElementById('btn-online-back');
+
+    if (btnToggleServerSettings) {
+      btnToggleServerSettings.addEventListener('click', () => {
+        sound.playClick();
+        const isHidden = serverSettingsDrawer.style.display === 'none';
+        serverSettingsDrawer.style.display = isHidden ? 'block' : 'none';
+      });
+    }
+
+    if (btnReloadIframe) {
+      btnReloadIframe.addEventListener('click', () => {
+        sound.playClick();
+        const url = serverUrlInput.value.trim();
+        onlineGameIframe.src = url;
+        checkServerStatus();
+      });
+    }
+
+    if (btnOnlineBack) {
+      btnOnlineBack.addEventListener('click', () => {
+        sound.playClick();
+        showView('menu');
+      });
+    }
+
+    document.getElementById('card-play-online')?.addEventListener('click', () => {
+      sound.playClick();
+      showView('online');
+    });
 
     function checkServerStatus() {
       const url = serverUrlInput.value.trim().replace(/\/$/, '');
@@ -2551,27 +2600,27 @@
         .then(() => {
           const latency = Math.round(performance.now() - start);
           serverStatusBadge.className = 'status-badge online';
-          serverStatusBadge.innerText = '● SERVER RESPONDING';
-          serverPingText.innerText = `(${latency}ms latency)`;
+          serverStatusBadge.innerText = '● LIVE SERVER READY';
+          serverPingText.innerText = `(${latency}ms)`;
         })
         .catch(() => {
-          // If no-cors or network error, let's still provide clear status
           serverStatusBadge.className = 'status-badge offline';
-          serverStatusBadge.innerText = '● OFFLINE / WAITING DEPLOYMENT';
-          serverPingText.innerText = '(Ready to connect when host is live)';
+          serverStatusBadge.innerText = '● OFFLINE / STANDBY';
+          serverPingText.innerText = '(Solo mode active)';
         });
     }
 
-    document.getElementById('btn-ping-server').addEventListener('click', () => {
+    document.getElementById('btn-ping-server')?.addEventListener('click', () => {
       sound.playClick();
       checkServerStatus();
     });
 
-    document.getElementById('btn-launch-online').addEventListener('click', () => {
+    document.getElementById('btn-launch-online')?.addEventListener('click', () => {
       sound.playClick();
       const url = serverUrlInput.value.trim();
       onlineGameIframe.src = url;
-      onlineGameIframe.classList.add('visible');
+      serverSettingsDrawer.style.display = 'none';
+      checkServerStatus();
     });
 
     serverUrlInput.addEventListener('change', () => {
