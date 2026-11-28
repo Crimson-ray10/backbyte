@@ -6,8 +6,8 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-FRONTEND_URL = "https://swimming-threshold-ranked-honor.trycloudflare.com"
-BACKEND_URL = "https://gabriel-really-absorption-mountains.trycloudflare.com/health"
+FRONTEND_URL = "https://framed-bone-basement-dairy.trycloudflare.com"
+BACKEND_URL = "https://eugene-motorcycle-replacing-imperial.trycloudflare.com/health"
 
 print("[Keepalive] Starting tunnel keepalive ping loop...")
 while True:
